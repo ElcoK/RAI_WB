@@ -1,6 +1,6 @@
 
 =========================
-How to install
+Getting started
 =========================
 
 Recommended option is to use a miniconda environment to work in for this project, relying on conda to handle some of the trickier library dependencies.
