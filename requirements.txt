@@ -1,5 +1,4 @@
 # List the project's python package requirements here
-gdal
 numpy
 pandas
 shapely
