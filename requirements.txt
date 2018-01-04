@@ -1,0 +1,13 @@
+# List the project's python package requirements here
+gdal
+numpy
+pandas
+shapely
+fiona
+geopy
+rtree
+geopandas
+pathos
+rasterio
+rasterstats
+boltons
