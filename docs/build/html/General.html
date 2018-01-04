@@ -242,7 +242,7 @@ This is much faster compared to clipping the osm.pbf file while extracting throu
 <p class="last">country_pbf: path string indicating the directory and name of the .osm.pbf file.</p>
 </dd>
 <dt>Returns:</dt>
-<dd>A shapefile with all the roads of the clipped country. The shapefile will be in WGS84 (epsg:4326). This is the same coordinate system as Openstreetmap.</dd>
+<dd>A shapefile with all the roads of the clipped country. The shapefile will be in <em>WGS84</em> (epsg:4326). This is the same coordinate system as Openstreetmap.</dd>
 </dl>
 </dd></dl>
 
@@ -257,10 +257,7 @@ This is much faster compared to clipping the osm.pbf file while extracting throu
 <dl class="docutils">
 <dt>Args:</dt>
 <dd><p class="first">line: a shapely LineString object with WGS-84 coordinates.</p>
-<dl class="last docutils">
-<dt>ellipsoid: string name of an ellipsoid that <cite>geopy</cite> understands (see</dt>
-<dd><a class="reference external" href="http://geopy.readthedocs.io/en/latest/#module-geopy.distance">http://geopy.readthedocs.io/en/latest/#module-geopy.distance</a>)</dd>
-</dl>
+<p class="last">ellipsoid: string name of an ellipsoid that <cite>geopy</cite> understands (see <a class="reference external" href="http://geopy.readthedocs.io/en/latest/#module-geopy.distance">http://geopy.readthedocs.io/en/latest/#module-geopy.distance</a>).</p>
 </dd>
 <dt>Returns:</dt>
 <dd>Length of line in meters.</dd>

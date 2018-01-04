@@ -171,6 +171,9 @@
 <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">rtree</span> <span class="k">import</span> <span class="n">index</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+<span class="kn">from</span> <span class="nn">pathos.multiprocess</span> <span class="k">import</span> <span class="n">Pool</span> <span class="p">,</span> <span class="n">cpu_count</span> 
+<span class="kn">import</span> <span class="nn">time</span>
 
 <div class="viewcode-block" id="create_poly_files"><a class="viewcode-back" href="../../General.html#scripts.functions.create_poly_files">[docs]</a><span class="k">def</span> <span class="nf">create_poly_files</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="n">global_shape</span><span class="p">,</span><span class="n">save_shapefile</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 
@@ -546,6 +549,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;The calculation of road lenghts has started!&#39;</span><span class="p">)</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
 <span class="c1"># =============================================================================</span>
 <span class="c1">#     &quot;&quot;&quot; Set path to dirs&quot;&quot;&quot;</span>
@@ -591,7 +595,6 @@
 <span class="c1"># =============================================================================</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">poly_dir</span><span class="p">):</span>
         <span class="n">create_poly_files</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="n">global_shape</span><span class="p">,</span><span class="n">save_shapefile</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
-
 
 <span class="c1"># =============================================================================</span>
 <span class="c1"># &quot;&quot;&quot; check if we have actually downloaded the openstreetmap input files. If not,</span>
@@ -685,6 +688,7 @@
         <span class="k">return</span> <span class="n">dist_per_roadtype</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">country</span><span class="p">)</span></div>
 
+
 <div class="viewcode-block" id="clip_osm"><a class="viewcode-back" href="../../General.html#scripts.functions.clip_osm">[docs]</a><span class="k">def</span> <span class="nf">clip_osm</span><span class="p">(</span><span class="n">continent_osm</span><span class="p">,</span><span class="n">country_poly</span><span class="p">,</span><span class="n">country_pbf</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Clip the country osm file from the larger continent (or planet) file and save to a new osm.pbf file. </span>
 <span class="sd">    This is much faster compared to clipping the osm.pbf file while extracting through ogr2ogr.</span>
@@ -716,7 +720,7 @@
 <span class="sd">        country_pbf: path string indicating the directory and name of the .osm.pbf file.</span>
 <span class="sd">        </span>
 <span class="sd">    Returns:</span>
-<span class="sd">        A shapefile with all the roads of the clipped country. The shapefile will be in WGS84 (epsg:4326). This is the same coordinate system as Openstreetmap.</span>
+<span class="sd">        A shapefile with all the roads of the clipped country. The shapefile will be in *WGS84* (epsg:4326). This is the same coordinate system as Openstreetmap.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ogr2ogr -progress -overwrite -f </span><span class="se">\&quot;</span><span class="s2">ESRI Shapefile</span><span class="se">\&quot;</span><span class="s2"> -sql </span><span class="se">\</span>
@@ -733,8 +737,7 @@
 <span class="sd">    Args:</span>
 <span class="sd">        line: a shapely LineString object with WGS-84 coordinates.</span>
 <span class="sd">        </span>
-<span class="sd">        ellipsoid: string name of an ellipsoid that `geopy` understands (see</span>
-<span class="sd">            http://geopy.readthedocs.io/en/latest/#module-geopy.distance)</span>
+<span class="sd">        ellipsoid: string name of an ellipsoid that `geopy` understands (see http://geopy.readthedocs.io/en/latest/#module-geopy.distance).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Length of line in meters.</span>
