@@ -28,7 +28,7 @@ __location__ = os.path.join(os.getcwd(), os.path.dirname(
 output_dir = os.path.join(__location__, "../api")
 module_dir = os.path.join(__location__, "../../")
 
-sys.path.insert(0, module_dir)
+sys.path.insert(0, os.path.abspath('../..'))
 
 # add list of modules used
 import mock
