@@ -10,6 +10,9 @@ import fiona
 from time import sleep
 import pandas as pd
 from rtree import index
+import urllib.request
+from pathos.multiprocess import Pool , cpu_count 
+import time
 
 def create_poly_files(base_path,global_shape,save_shapefile=True):
 
@@ -385,6 +388,7 @@ def road_length(base_path,multiprocess=True,overwrite=True):
     """
     
     print ('The calculation of road lenghts has started!')
+    start = time.time()
 
 # =============================================================================
 #     """ Set path to dirs"""
@@ -430,7 +434,6 @@ def road_length(base_path,multiprocess=True,overwrite=True):
 # =============================================================================
     if not os.listdir(poly_dir):
         create_poly_files(base_path,global_shape,save_shapefile=overwrite)
-
 
 # =============================================================================
 # """ check if we have actually downloaded the openstreetmap input files. If not,
@@ -524,6 +527,7 @@ def country_road_length(country,continent_osm,base_path,overwrite=True):
         return dist_per_roadtype
     except Exception as e: print(str(e)+' for %s' % country)
 
+
 def clip_osm(continent_osm,country_poly,country_pbf):
     """ Clip the country osm file from the larger continent (or planet) file and save to a new osm.pbf file. 
     This is much faster compared to clipping the osm.pbf file while extracting through ogr2ogr.
@@ -555,7 +559,7 @@ def extract_osm(country_shp,country_pbf):
         country_pbf: path string indicating the directory and name of the .osm.pbf file.
         
     Returns:
-        A shapefile with all the roads of the clipped country. The shapefile will be in WGS84 (epsg:4326). This is the same coordinate system as Openstreetmap.
+        A shapefile with all the roads of the clipped country. The shapefile will be in *WGS84* (epsg:4326). This is the same coordinate system as Openstreetmap.
     """
     
     os.system("ogr2ogr -progress -overwrite -f \"ESRI Shapefile\" -sql \
@@ -572,8 +576,7 @@ def line_length(line, ellipsoid='WGS-84'):
     Args:
         line: a shapely LineString object with WGS-84 coordinates.
         
-        ellipsoid: string name of an ellipsoid that `geopy` understands (see
-            http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
+        ellipsoid: string name of an ellipsoid that `geopy` understands (see http://geopy.readthedocs.io/en/latest/#module-geopy.distance).
 
     Returns:
         Length of line in meters.
