@@ -526,6 +526,126 @@
     <span class="k">except</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> did not finish!&#39;</span> <span class="o">%</span> <span class="n">country</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="road_length"><a class="viewcode-back" href="../../Road_lenght.html#scripts.functions.road_length">[docs]</a><span class="k">def</span> <span class="nf">road_length</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="n">multiprocess</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main function to estimate the length of all the roads we are interested in. </span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        </span>
+<span class="sd">        base_path: base path to location of all files and directories in this project.</span>
+<span class="sd">        </span>
+<span class="sd">        multiprocess: set to True by default. Set to False in the case of limited processing power.</span>
+<span class="sd">        </span>
+<span class="sd">        overwrite: set to True by default. This relates to all input data (i.e. .poly files, .osm.pbf files and shapefiles).</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        </span>
+<span class="sd">        an Excel file with the length of all primary, secondary, tertiary, track and other roads for each country.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;The calculation of road lenghts has started!&#39;</span><span class="p">)</span>
+
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     &quot;&quot;&quot; Set path to dirs&quot;&quot;&quot;</span>
+<span class="c1"># =============================================================================</span>
+    <span class="n">dir_out</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;output_data&#39;</span><span class="p">)</span>
+    <span class="n">poly_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;poly_files&#39;</span><span class="p">)</span>
+    <span class="n">osm_path_in</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;osm_continent&#39;</span><span class="p">)</span>
+
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     &quot;&quot;&quot; create directories if they are not created yet &quot;&quot;&quot;</span>
+<span class="c1"># =============================================================================</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dir_out</span><span class="p">):</span>
+         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dir_out</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">poly_dir</span><span class="p">):</span>
+         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">poly_dir</span><span class="p">)</span>           
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">osm_path_in</span><span class="p">):</span>
+         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">osm_path_in</span><span class="p">)</span>     
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     &quot;&quot;&quot;Set path to files we use &quot;&quot;&quot;</span>
+<span class="c1"># =============================================================================</span>
+    <span class="n">wb_country_in</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;input_data&#39;</span><span class="p">,</span><span class="s1">&#39;wbccodes2014.csv&#39;</span><span class="p">)</span>
+    <span class="n">global_shape</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;input_data&#39;</span><span class="p">,</span><span class="s1">&#39;2015_GAUL_Dataset_Mod.gdb&#39;</span><span class="p">)</span>
+
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     &quot;&quot;&quot;Load country shapes and list and only save the required countries&quot;&quot;&quot;</span>
+<span class="c1"># =============================================================================</span>
+    <span class="n">wb_country</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">wb_country_in</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    
+    <span class="c1">#filter high income countries from country file</span>
+    <span class="n">country_list</span> <span class="o">=</span> <span class="n">wb_country</span><span class="p">[[</span><span class="s1">&#39;country&#39;</span><span class="p">,</span><span class="s1">&#39;continent&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">wb_country</span><span class="p">[</span><span class="s1">&#39;wbregion&#39;</span><span class="p">]</span><span class="o">!=</span><span class="s1">&#39;YHI&#39;</span><span class="p">]</span>
+
+    <span class="c1"># add column to country list so we can easily look up the required continental</span>
+    <span class="c1"># osm file for that continent    </span>
+    <span class="n">map_continent</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;MA&#39;</span><span class="p">:</span> <span class="s1">&#39;central-america&#39;</span><span class="p">,</span><span class="s1">&#39;SA&#39;</span><span class="p">:</span> <span class="s1">&#39;south-america&#39;</span><span class="p">,</span><span class="s1">&#39;EU&#39;</span><span class="p">:</span> <span class="s1">&#39;europe&#39;</span><span class="p">,</span><span class="s1">&#39;AS&#39;</span><span class="p">:</span> <span class="s1">&#39;asia&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;AU&#39;</span><span class="p">:</span> <span class="s1">&#39;australia-oceania&#39;</span><span class="p">,</span><span class="s1">&#39;AF&#39;</span><span class="p">:</span><span class="s1">&#39;africa&#39;</span><span class="p">,</span><span class="s1">&#39;AM&#39;</span><span class="p">:</span><span class="s1">&#39;north-america&#39;</span><span class="p">}</span>
+   
+    <span class="n">country_list</span><span class="p">[</span><span class="s1">&#39;osm-cont&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">country_list</span><span class="p">[</span><span class="s1">&#39;continent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">map_continent</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span> 
+    
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     &quot;&quot;&quot; create .poly files to clip countries from osm.pbf files &quot;&quot;&quot;</span>
+<span class="c1"># =============================================================================</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">poly_dir</span><span class="p">):</span>
+        <span class="n">create_poly_files</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="n">global_shape</span><span class="p">,</span><span class="n">save_shapefile</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
+
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># &quot;&quot;&quot; check if we have actually downloaded the openstreetmap input files. If not,</span>
+<span class="c1"># lets download them. Note: this will take a while! &quot;&quot;&quot; </span>
+<span class="c1"># =============================================================================</span>
+    <span class="n">continent_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;central-america&#39;</span><span class="p">,</span><span class="s1">&#39;south-america&#39;</span><span class="p">,</span><span class="s1">&#39;europe&#39;</span><span class="p">,</span><span class="s1">&#39;asia&#39;</span><span class="p">,</span><span class="s1">&#39;australia-oceania&#39;</span><span class="p">,</span><span class="s1">&#39;africa&#39;</span><span class="p">,</span><span class="s1">&#39;north-america&#39;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">continent</span> <span class="ow">in</span> <span class="n">continent_list</span><span class="p">:</span>        
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://download.geofabrik.de/</span><span class="si">%s</span><span class="s1">-latest.osm.pbf&#39;</span> <span class="o">%</span> <span class="n">continent</span>
+        <span class="k">if</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">-latest.osm.pbf&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">continent</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span>  <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">osm_path_in</span><span class="p">):</span>
+            <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">osm_path_in</span><span class="p">)</span>
+            
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     &quot;&quot;&quot; create extracted osm files for each country per continent &quot;&quot;&quot;</span>
+<span class="c1"># =============================================================================</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">countries</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">continent_osms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">base_paths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">country</span> <span class="ow">in</span> <span class="n">country_list</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">country</span> <span class="o">=</span> <span class="n">country</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">continent_osm</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">osm_path_in</span><span class="p">,</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">-latest.osm.pbf&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">country</span><span class="p">[</span><span class="s1">&#39;osm-cont&#39;</span><span class="p">]))</span>
+        <span class="n">countries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">country</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">])</span>
+        <span class="n">continent_osms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">continent_osm</span><span class="p">)</span>
+        <span class="n">base_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">base_path</span><span class="p">)</span>
+
+    <span class="c1"># multiprocessing will start if set to True. Set to False with limited processing capacities    </span>
+    <span class="k">if</span> <span class="n">multiprocess</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+        <span class="n">pool</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">(</span><span class="n">cpu_count</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">country_road_length</span><span class="p">,</span> <span class="nb">zip</span><span class="p">(</span><span class="n">countries</span><span class="p">,</span><span class="n">continent_osms</span><span class="p">,</span><span class="n">base_paths</span><span class="p">,</span><span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">))</span> 
+    
+    <span class="c1"># when multiprocessing set to False, we will just loop over the countries.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">country</span> <span class="ow">in</span> <span class="n">country_list</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">country</span> <span class="o">=</span> <span class="n">country</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">continent_osm</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">osm_path_in</span><span class="p">,</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">-latest.osm.pbf&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">country</span><span class="p">[</span><span class="s1">&#39;osm-cont&#39;</span><span class="p">]))</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">country_road_length</span><span class="p">(</span><span class="n">country</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">],</span><span class="n">continent_osm</span><span class="p">,</span><span class="n">base_path</span><span class="p">,</span><span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">))</span>
+            
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">out</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    
+    <span class="n">map_country</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">wb_country</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">],</span><span class="n">wb_country</span><span class="p">[</span><span class="s1">&#39;country_name&#39;</span><span class="p">]))</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Country&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">map_country</span><span class="p">)</span>
+
+    <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Country&#39;</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelWriter</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_out</span><span class="p">,</span><span class="s1">&#39;dist_roads.xlsx&#39;</span><span class="p">))</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    
+    <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;It took &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">((</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)))</span> <span class="o">+</span> <span class="s2">&quot; seconds to finish!&quot;</span><span class="p">)</span>         </div>
+
 <div class="viewcode-block" id="country_road_length"><a class="viewcode-back" href="../../Road_lenght.html#scripts.functions.country_road_length">[docs]</a><span class="k">def</span> <span class="nf">country_road_length</span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="n">continent_osm</span><span class="p">,</span><span class="n">base_path</span><span class="p">,</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     
     <span class="sd">&quot;&quot;&quot;</span>
