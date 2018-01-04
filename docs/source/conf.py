@@ -33,7 +33,7 @@ sys.path.insert(0, module_dir)
 # add list of modules used
 import mock
 
-MOCK_MODULES = ['osgeo.gdal','numpy', 'pandas', 'shapely', 'fiona', 'geopy', 'rtree', 'geopandas', 'pathos', 'rasterio','rasterstats','boltons']
+MOCK_MODULES = ['numpy', 'pandas', 'shapely', 'fiona', 'geopy', 'rtree', 'geopandas', 'pathos', 'rasterio','rasterstats','boltons']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
 
