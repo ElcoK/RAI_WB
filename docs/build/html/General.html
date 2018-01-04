@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>General functions &mdash; Worldbank Rural Acessibility Index 0.1.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Worldbank Rural Acessibility Index 0.1.1 documentation" href="index.html"/>
+        <link rel="next" title="Road length per country" href="Road_lenght.html"/>
+        <link rel="prev" title="How to install" href="readme.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Worldbank Rural Acessibility Index
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">How to install</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">General functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#create-poly-files">Create .poly files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#get-country-file">Get country file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#clip-country-in-openstreetmap">Clip country in Openstreetmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#extract-country-from-openstreetmap">Extract country from Openstreetmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#estimate-length-of-line">Estimate length of line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#map-to-aggregate-set-of-roads">Map to aggregate set of roads</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Road_lenght.html">Road length per country</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RAI.html">Rural Accessbility Index</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Worldbank Rural Acessibility Index</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>General functions</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/General.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="general-functions">
+<h1>General functions<a class="headerlink" href="#general-functions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="create-poly-files">
+<h2>Create .poly files<a class="headerlink" href="#create-poly-files" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="descclassname">scripts.functions.</code><code class="descname">create_poly_files</code><span class="sig-paren">(</span><em>base_path</em>, <em>global_shape</em>, <em>save_shapefile=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#create_poly_files"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>This function will create the .poly files from the world shapefile. These
+.poly files are used to extract data from the openstreetmap files.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">base_path: base path to location of all files.</p>
+<p>global_shape: exact path to the global shapefile used to create the poly files.</p>
+<p class="last">save_shape_file: when set True, the new shapefile with the countries that we include in this analysis will be saved.</p>
+</dd>
+<dt>Returns:</dt>
+<dd>.poly file for each country in a new dir in the working directory.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="get-country-file">
+<h2>Get country file<a class="headerlink" href="#get-country-file" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="descclassname">scripts.functions.</code><code class="descname">get_country</code><span class="sig-paren">(</span><em>country</em>, <em>continent_osm</em>, <em>base_path</em>, <em>overwrite=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#get_country"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Extraction of the road data for the specified country from OSM. We use the continental OSM file, downloaded from <a class="reference external" href="http://download.geofabrik.de">http://download.geofabrik.de</a>.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">country: to country for which we calculate the RAI.</p>
+<dl class="docutils">
+<dt>continent_osm: the continent that the country ‘belongs’ to. This is </dt>
+<dd>required in the osm extraction.</dd>
+</dl>
+<p class="last">base_path: base path to location of all files.</p>
+</dd>
+<dt>Returns:</dt>
+<dd>load_country: a geodataframe containing all the roads and their length.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="clip-country-in-openstreetmap">
+<h2>Clip country in Openstreetmap<a class="headerlink" href="#clip-country-in-openstreetmap" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="descclassname">scripts.functions.</code><code class="descname">clip_osm</code><span class="sig-paren">(</span><em>continent_osm</em>, <em>country_poly</em>, <em>country_pbf</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#clip_osm"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Clip the country osm file from the larger continent (or planet) file and save to a new osm.pbf file. 
+This is much faster compared to clipping the osm.pbf file while extracting through ogr2ogr.</p>
+<p>This function uses the osmconvert tool, which can be found at <a class="reference external" href="http://wiki.openstreetmap.org/wiki/Osmconvert">http://wiki.openstreetmap.org/wiki/Osmconvert</a>.</p>
+<p>Either add the directory where this executable is located to your environmental variables or just put it in the ‘scripts’ directory.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">continent_osm: path string to the osm.pbf file of the continent associated with the country.</p>
+<p>country_poly: path string to the .poly file, made through the ‘create_poly_files’ function.</p>
+<p class="last">country_pbf: path string indicating the final output dir and output name of the new .osm.pbf file.</p>
+</dd>
+<dt>Returns:</dt>
+<dd>a clipped .osm.pbf file.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="extract-country-from-openstreetmap">
+<h2>Extract country from Openstreetmap<a class="headerlink" href="#extract-country-from-openstreetmap" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="descclassname">scripts.functions.</code><code class="descname">extract_osm</code><span class="sig-paren">(</span><em>country_shp</em>, <em>country_pbf</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#extract_osm"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Extract a shapefile with all the road information from the openstreetmap file.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">country_shp: path_string indicating the final output directory and output name of the new shapefile.</p>
+<p class="last">country_pbf: path string indicating the directory and name of the .osm.pbf file.</p>
+</dd>
+<dt>Returns:</dt>
+<dd>A shapefile with all the roads of the clipped country. The shapefile will be in WGS84 (epsg:4326). This is the same coordinate system as Openstreetmap.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="estimate-length-of-line">
+<h2>Estimate length of line<a class="headerlink" href="#estimate-length-of-line" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="descclassname">scripts.functions.</code><code class="descname">line_length</code><span class="sig-paren">(</span><em>line</em>, <em>ellipsoid='WGS-84'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#line_length"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Length of a line in meters, given in geographic coordinates.</p>
+<p>Adapted from <a class="reference external" href="https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285">https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285</a></p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">line: a shapely LineString object with WGS-84 coordinates.</p>
+<dl class="last docutils">
+<dt>ellipsoid: string name of an ellipsoid that <cite>geopy</cite> understands (see</dt>
+<dd><a class="reference external" href="http://geopy.readthedocs.io/en/latest/#module-geopy.distance">http://geopy.readthedocs.io/en/latest/#module-geopy.distance</a>)</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>Length of line in meters.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="map-to-aggregate-set-of-roads">
+<h2>Map to aggregate set of roads<a class="headerlink" href="#map-to-aggregate-set-of-roads" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="descclassname">scripts.functions.</code><code class="descname">map_roads</code><span class="sig-paren">(</span><em>load_country</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#map_roads"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>To create a new column with an aggregated list of road types.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>load_country: a geodataframe containing all the roads of a country.</dd>
+<dt>Returns:</dt>
+<dd>load_country: same geodataframe but with an additional ‘roads’ column containing the aggregated road types.</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="Road_lenght.html" class="btn btn-neutral float-right" title="Road length per country" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="readme.html" class="btn btn-neutral" title="How to install" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Elco Koks.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
