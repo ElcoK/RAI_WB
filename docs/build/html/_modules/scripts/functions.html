@@ -172,7 +172,7 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">rtree</span> <span class="k">import</span> <span class="n">index</span>
 
-<div class="viewcode-block" id="create_poly_files"><a class="viewcode-back" href="../../General.html#scripts.functions.create_poly_files">[docs]</a><span class="k">def</span> <span class="nf">create_poly_files</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="n">global_shape</span><span class="p">,</span><span class="n">save_shapefile</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="create_poly_files"><a class="viewcode-back" href="../../General.html#scripts.functions.create_poly_files">[docs]</a><span class="k">def</span> <span class="nf">create_poly_files</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="n">global_shape</span><span class="p">,</span><span class="n">save_shapefile</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function will create the .poly files from the world shapefile. These</span>
@@ -183,7 +183,7 @@
 <span class="sd">        </span>
 <span class="sd">        global_shape: exact path to the global shapefile used to create the poly files.</span>
 <span class="sd">        </span>
-<span class="sd">        save_shape_file: when set True, the new shapefile with the countries that we include in this analysis will be saved.       </span>
+<span class="sd">        save_shape_file: when True, the new shapefile with the countries that we include in this analysis will be saved.       </span>
 <span class="sd">    </span>
 <span class="sd">    Returns:</span>
 <span class="sd">        .poly file for each country in a new dir in the working directory.</span>
@@ -278,7 +278,7 @@
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;END&quot;</span> <span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="get_country"><a class="viewcode-back" href="../../General.html#scripts.functions.get_country">[docs]</a><span class="k">def</span> <span class="nf">get_country</span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="n">continent_osm</span><span class="p">,</span><span class="n">base_path</span><span class="p">,</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  
+<div class="viewcode-block" id="get_country"><a class="viewcode-back" href="../../General.html#scripts.functions.get_country">[docs]</a><span class="k">def</span> <span class="nf">get_country</span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="n">continent_osm</span><span class="p">,</span><span class="n">base_path</span><span class="p">,</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>  
 
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extraction of the road data for the specified country from OSM. We use the continental OSM file, downloaded from http://download.geofabrik.de.</span>
@@ -354,7 +354,7 @@
     <span class="k">return</span> <span class="n">load_country</span></div>
 
 
-<div class="viewcode-block" id="get_RAI"><a class="viewcode-back" href="../../RAI.html#scripts.functions.get_RAI">[docs]</a><span class="k">def</span> <span class="nf">get_RAI</span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="n">continent_osm</span><span class="p">,</span><span class="n">base_path</span><span class="p">,</span><span class="n">grump</span><span class="p">):</span>
+<div class="viewcode-block" id="get_RAI"><a class="viewcode-back" href="../../RAI.html#scripts.functions.get_RAI">[docs]</a><span class="k">def</span> <span class="nf">get_RAI</span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="n">continent_osm</span><span class="p">,</span><span class="n">base_path</span><span class="p">,</span><span class="n">grump</span><span class="p">,</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Estimation of the Rural Accesibility Index (RAI) for the specified country.</span>
@@ -461,7 +461,7 @@
     <span class="c1"># =============================================================================</span>
        
         <span class="c1"># load data, similar as when we estimate the length of the roads</span>
-        <span class="n">load_country</span> <span class="o">=</span> <span class="n">get_country</span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="n">continent_osm</span><span class="p">,</span><span class="n">base_path</span><span class="p">)</span>
+        <span class="n">load_country</span> <span class="o">=</span> <span class="n">get_country</span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="n">continent_osm</span><span class="p">,</span><span class="n">base_path</span><span class="p">,</span><span class="n">overwrite</span><span class="p">)</span>
        
         <span class="c1"># if we include tertiary as well, we do a different filter</span>
         <span class="k">if</span> <span class="n">tertiary</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
@@ -526,7 +526,7 @@
     <span class="k">except</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> did not finish!&#39;</span> <span class="o">%</span> <span class="n">country</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="country_road_length"><a class="viewcode-back" href="../../Road_lenght.html#scripts.functions.country_road_length">[docs]</a><span class="k">def</span> <span class="nf">country_road_length</span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="n">continent_osm</span><span class="p">,</span><span class="n">base_path</span><span class="p">):</span>
+<div class="viewcode-block" id="country_road_length"><a class="viewcode-back" href="../../Road_lenght.html#scripts.functions.country_road_length">[docs]</a><span class="k">def</span> <span class="nf">country_road_length</span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="n">continent_osm</span><span class="p">,</span><span class="n">base_path</span><span class="p">,</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function to estimate the road length for each road segment.</span>
@@ -551,7 +551,6 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">load_country</span> <span class="o">=</span> <span class="n">get_country</span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="n">continent_osm</span><span class="p">,</span><span class="n">base_path</span><span class="p">,</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="n">sleep</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
             <span class="n">load_country</span> <span class="o">=</span> <span class="n">get_country</span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="n">continent_osm</span><span class="p">,</span><span class="n">base_path</span><span class="p">,</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             
     <span class="c1"># =============================================================================</span>
