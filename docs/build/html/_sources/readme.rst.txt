@@ -3,7 +3,7 @@
 Getting started
 =========================
 
-Recommended option is to use a miniconda environment to work in for this project, relying on conda to handle some of the trickier library dependencies.
+Recommended option is to use a `Miniconda <https://conda.io/miniconda.html>`_ environment to work in for this project, relying on conda to handle some of the trickier library dependencies.
 
 The most easiest way to do so is to use the requirements.yml file as provided in the github page. 
 
