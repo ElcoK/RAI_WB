@@ -11,7 +11,7 @@ from time import sleep
 import pandas as pd
 from rtree import index
 
-def create_poly_files(base_path,global_shape,save_shapefile=False):
+def create_poly_files(base_path,global_shape,save_shapefile=True):
 
     """
     This function will create the .poly files from the world shapefile. These
@@ -22,7 +22,7 @@ def create_poly_files(base_path,global_shape,save_shapefile=False):
         
         global_shape: exact path to the global shapefile used to create the poly files.
         
-        save_shape_file: when set True, the new shapefile with the countries that we include in this analysis will be saved.       
+        save_shape_file: when True, the new shapefile with the countries that we include in this analysis will be saved.       
     
     Returns:
         .poly file for each country in a new dir in the working directory.
@@ -117,7 +117,7 @@ def create_poly_files(base_path,global_shape,save_shapefile=False):
         f.write("END" +"\n")
         f.close()
 
-def get_country(country,continent_osm,base_path,overwrite=False):  
+def get_country(country,continent_osm,base_path,overwrite=True):  
 
     """
     Extraction of the road data for the specified country from OSM. We use the continental OSM file, downloaded from http://download.geofabrik.de.
@@ -193,7 +193,7 @@ def get_country(country,continent_osm,base_path,overwrite=False):
     return load_country
 
 
-def get_RAI(country,continent_osm,base_path,grump):
+def get_RAI(country,continent_osm,base_path,grump,overwrite=True):
 
     """
     Estimation of the Rural Accesibility Index (RAI) for the specified country.
@@ -300,7 +300,7 @@ def get_RAI(country,continent_osm,base_path,grump):
     # =============================================================================
        
         # load data, similar as when we estimate the length of the roads
-        load_country = get_country(country,continent_osm,base_path)
+        load_country = get_country(country,continent_osm,base_path,overwrite)
        
         # if we include tertiary as well, we do a different filter
         if tertiary == True:
@@ -365,7 +365,7 @@ def get_RAI(country,continent_osm,base_path,grump):
     except:
         print('%s did not finish!' % country)
 
-def country_road_length(country,continent_osm,base_path):
+def country_road_length(country,continent_osm,base_path,overwrite=True):
     
     """
     Function to estimate the road length for each road segment.
@@ -390,7 +390,6 @@ def country_road_length(country,continent_osm,base_path):
         try:
             load_country = get_country(country,continent_osm,base_path,overwrite=False)
         except:
-            sleep(30)
             load_country = get_country(country,continent_osm,base_path,overwrite=True)
             
     # =============================================================================
