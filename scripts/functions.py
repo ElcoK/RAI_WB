@@ -272,7 +272,7 @@ def get_country(country,continent_osm,base_path,overwrite=False,RAI=False):
 # =============================================================================
     return load_country
 
-def create_figure(country,load_country,base_path):
+def create_figure(country,load_country,base_path,report=False):
     """
     Create a figure of the road network
     
@@ -282,6 +282,8 @@ def create_figure(country,load_country,base_path):
         *load_country* : The geodataframe of the country.
         
         *base_path* : The base path to the location of all files and scripts.
+        
+        *report* : Set to False by default. When set to True, the figure will not be saved with a figure title.
 
     Returns:
         A .png file with a classified road system of the specified country.
@@ -315,16 +317,18 @@ def create_figure(country,load_country,base_path):
     lw_all = list(load_country['roads'].map(lambda x: (map_linewidth[x])) )
     tot_bounds = list(load_country.total_bounds)
     ax.set_extent([tot_bounds[0]-0.1,tot_bounds[2]+0.1,tot_bounds[1]-0.1,tot_bounds[3]+0.1] , crs=proj_lat_lon)
-    world = gpd.read_file('F:\Dropbox\WorldBank\input_data\country_shapes.shp')
+    world = gpd.read_file(os.path.join(base_path,'input_data','country_shapes.shp'))
     world.plot(ax=ax,color='#FEF9E0',lw=0.3,edgecolor='k')
                
     load_country.plot(ax=ax,column='roads',linewidth=lw_all,categorical=True,legend=True,cmap=cmap)
 
     ax.legend([color1,color2,color3,color4],legend_handles,numpoints=1, loc=1) 
     ax.background_patch.set_facecolor('#D0E3F4')
-    
-    admin_name = world['ADM0_NAME'].loc[world['ISO3166_1_']==country].values[0]
-    plt.title('Road network of %s' % admin_name,fontweight='bold')
+     
+    # if report set to True, the title will not be printed.
+    if report == False:
+        admin_name = world['ADM0_NAME'].loc[world['ISO3166_1_']==country].values[0]
+        plt.title('Road network of %s' % admin_name,fontweight='bold')
 
     figure_out= os.path.join(base_path,'Figures','%s.png' % country)
     plt.savefig(figure_out,dpi=500,bbox_inches='tight')
