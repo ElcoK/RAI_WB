@@ -235,13 +235,14 @@ function is much faster compared to the original geopandas overlay method.</p>
 <h2>Save a map of the roads of a country<a class="headerlink" href="#save-a-map-of-the-roads-of-a-country" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt>
-<code class="descclassname">scripts.functions.</code><code class="descname">create_figure</code><span class="sig-paren">(</span><em>country</em>, <em>load_country</em>, <em>base_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#create_figure"><span class="viewcode-link">[source]</span></a></dt>
+<code class="descclassname">scripts.functions.</code><code class="descname">create_figure</code><span class="sig-paren">(</span><em>country</em>, <em>load_country</em>, <em>base_path</em>, <em>report=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#create_figure"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Create a figure of the road network</p>
 <dl class="docutils">
 <dt>Args:</dt>
 <dd><p class="first"><em>country</em> : The ISO-code of the country.</p>
 <p><em>load_country</em> : The geodataframe of the country.</p>
-<p class="last"><em>base_path</em> : The base path to the location of all files and scripts.</p>
+<p><em>base_path</em> : The base path to the location of all files and scripts.</p>
+<p class="last"><em>report</em> : Set to False by default. When set to True, the figure will not be saved with a figure title.</p>
 </dd>
 <dt>Returns:</dt>
 <dd>A .png file with a classified road system of the specified country.</dd>
