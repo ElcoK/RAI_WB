@@ -4,21 +4,96 @@ from geopy.distance import vincenty
 from boltons.iterutils import pairwise
 from rasterstats import zonal_stats
 import geopandas as gpd
-from shapely.geometry import mapping,shape
+from shapely.geometry import mapping
 import numpy as np
 import fiona
 from time import sleep
 import pandas as pd
-from rtree import index
-import urllib.request
-from pathos.multiprocess import Pool , cpu_count 
-import time
+
+import subprocess
+import shutil
+import warnings
+from functools import reduce
+
+import cartopy.crs as ccrs
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib.lines import Line2D
+
+warnings.filterwarnings("ignore", category=FutureWarning) 
+
+def spatial_overlays(df1, df2, how='intersection'):
+    """
+    Compute overlay intersection of two GeoPandasDataFrames df1 and df2. This
+    function is much faster compared to the original geopandas overlay method
+    
+    Adapted from https://github.com/geopandas/geopandas/issues/400 
+    
+    Args:
+        df1: dataframe to be either intersected or 'erased', using the difference function.
+            
+        df2: dataframe to intersect or to erase, using the difference function.
+        
+    Return:
+        df1: an either intersected or (partly) erased geopandas dataframe.
+    """
+
+    df1 = df1.copy()
+    df2 = df2.copy()
+    df1['geometry'] = df1.geometry.buffer(0)
+    df2['geometry'] = df2.geometry.buffer(0)
+
+# =============================================================================
+#     """ the part of the function which does the intersection analysis """
+# =============================================================================
+    if how=='intersection':
+        # Spatial Index to create intersections
+        spatial_index = df2.sindex
+        df1['bbox'] = df1.geometry.apply(lambda x: x.bounds)
+        df1['histreg']=df1.bbox.apply(lambda x:list(spatial_index.intersection(x)))
+        pairs = df1['histreg'].to_dict()
+        nei = []
+        for i,j in pairs.items():
+            for k in j:
+                nei.append([i,k])
+        
+        pairs = gpd.GeoDataFrame(nei, columns=['idx1','idx2'], crs=df1.crs)
+        pairs = pairs.merge(df1, left_on='idx1', right_index=True)
+        pairs = pairs.merge(df2, left_on='idx2', right_index=True, suffixes=['_1','_2'])
+        pairs['Intersection'] = pairs.apply(lambda x: (x['geometry_1'].intersection(x['geometry_2'])).buffer(0), axis=1)
+        pairs = gpd.GeoDataFrame(pairs, columns=pairs.columns, crs=df1.crs)
+        cols = pairs.columns.tolist()
+        cols.remove('geometry_1')
+        cols.remove('geometry_2')
+        cols.remove('histreg')
+        cols.remove('bbox')
+        cols.remove('Intersection')
+        dfinter = pairs[cols+['Intersection']].copy()
+        dfinter.rename(columns={'Intersection':'geometry'}, inplace=True)
+        dfinter = gpd.GeoDataFrame(dfinter, columns=dfinter.columns, crs=pairs.crs)
+        dfinter = dfinter.loc[dfinter.geometry.is_empty==False]
+        return dfinter
+# =============================================================================
+#     """ the part of the function which does the difference/erase analysis """
+# =============================================================================
+    elif how=='difference':
+        spatial_index = df2.sindex
+        df1['bbox'] = df1.geometry.apply(lambda x: x.bounds)
+        df1['histreg']=df1.bbox.apply(lambda x:list(spatial_index.intersection(x)))
+        df1['new_g'] = df1.apply(lambda x: reduce(lambda x, y: x.difference(y).buffer(0), [x.geometry]+list(df2.iloc[x.histreg].geometry)) , axis=1)
+        df1.geometry = df1.new_g
+        df1 = df1.loc[df1.geometry.is_empty==False].copy()
+        df1.drop(['bbox', 'histreg', 'new_g'], axis=1, inplace=True)
+        return df1
 
 def create_poly_files(base_path,global_shape,save_shapefile=True):
 
     """
     This function will create the .poly files from the world shapefile. These
     .poly files are used to extract data from the openstreetmap files.
+    
+    This function is adapted from the OSMPoly function in QGIS.
     
     Args:
         base_path: base path to location of all files.
@@ -58,24 +133,23 @@ def create_poly_files(base_path,global_shape,save_shapefile=True):
     # filter high income countries from country file
     country_list = wb_country['country'].loc[wb_country['wbregion']!='YHI']
     
-    country_list = ['KSV']
     # filter polygon file
     wb_poly = wb_poly.loc[wb_poly['ISO3166_1_Alpha_3'].isin(country_list)]
-    
-    # we need to simplify the country shapes a bit. If the polygon is too diffcult,
-    # osmconvert cannot handle it.
-    wb_poly['geometry'] = wb_poly.simplify(tolerance = 0.005, preserve_topology=False)
     wb_poly.crs = {'init' :'epsg:4326'}
 
     # and save the new country shapefile if requested
     if save_shapefile == True:
         wb_poly.to_file(wb_poly_out)
+    
+    # we need to simplify the country shapes a bit. If the polygon is too diffcult,
+    # osmconvert cannot handle it.
+    wb_poly['geometry'] = wb_poly.simplify(tolerance = 0.005, preserve_topology=False)
+
 
 # =============================================================================
 #   """ The important part of this function: create .poly files to clip the country 
 #   data from the openstreetmap file """    
 # =============================================================================
-
     num = 0
     # iterate over the counties (rows) in the world shapefile
     for f in wb_poly.iterrows():
@@ -120,7 +194,7 @@ def create_poly_files(base_path,global_shape,save_shapefile=True):
         f.write("END" +"\n")
         f.close()
 
-def get_country(country,continent_osm,base_path,overwrite=True):  
+def get_country(country,continent_osm,base_path,overwrite=False,RAI=False):  
 
     """
     Extraction of the road data for the specified country from OSM. We use the continental OSM file, downloaded from http://download.geofabrik.de.
@@ -133,6 +207,10 @@ def get_country(country,continent_osm,base_path,overwrite=True):
                         required in the osm extraction.
                         
         base_path: base path to location of all files.
+        
+        overwrite: this is set on True by default, set on False if you are sure the input files are correct (it will save a lot of computation time).
+
+        RAI: this is set on False by default. set on True if this country extracting is used for the RAI analysis. It will skip the road length calculation (saving computation time).
         
     Returns:
         load_country: a geodataframe containing all the roads and their length.
@@ -181,9 +259,13 @@ def get_country(country,continent_osm,base_path,overwrite=True):
 
     uniq = load_country['highway'].value_counts()
     uniq = list(uniq[uniq > 20].index)
+    uniq.extend(['primary','secondary','trunk','motorway'])
+    uniq = list(set(uniq))
     load_country = load_country[load_country['highway'].isin(uniq)]
-    load_country['distance'] = load_country['geometry'].apply(line_length)
-    load_country = load_country[load_country['distance'] < 500]
+    
+    if RAI is False:
+        load_country['distance'] = load_country['geometry'].apply(line_length)
+        load_country = load_country[load_country['distance'] < 500]
 
 # =============================================================================
 #   Add a new column to the dataframe with the aggregated road classification
@@ -195,14 +277,12 @@ def get_country(country,continent_osm,base_path,overwrite=True):
 # =============================================================================
     return load_country
 
-
-def get_RAI(country,continent_osm,base_path,grump,overwrite=True):
+def get_RAI(country,continent_osm,base_path,grump,overwrite=False,tertiary=False):
 
     """
     Estimation of the Rural Accesibility Index (RAI) for the specified country.
     
-    The RAI is calculated by using the methodology specified in the report 
-    below:
+    The RAI is calculated by using the methodology specified in the report below:
         
         World Bank. 2016. Measuring rural access: using new technologies. 
         Washington, D.C. : World Bank Group.  http://bit.ly/2p5asME 
@@ -224,7 +304,6 @@ def get_RAI(country,continent_osm,base_path,grump,overwrite=True):
     try:
     
         print('%s started!' % country)
-        tertiary=False
         
     # =============================================================================
     #     """ First set all paths for output dirs"""
@@ -238,11 +317,33 @@ def get_RAI(country,continent_osm,base_path,grump,overwrite=True):
         #set global file paths for worldpop
         if ('central-america' in continent_osm) or ('south-america' in continent_osm) :
             world_pop = os.path.join(base_path,'Worldpop','LAC_PPP_2015_adj_v2.tif') 
-        if ('africa' in continent_osm):
+        elif ('africa' in continent_osm):
             world_pop = os.path.join(base_path,'Worldpop','AFR_PPP_2015_adj_v2.tif') 
-        if ('asia' in continent_osm):
+        elif ('asia' in continent_osm):
             world_pop = os.path.join(base_path,'Worldpop','Asia_PPP_2015_adj_v2.tif') 
+        elif ('europe' in continent_osm):
+            world_pop = os.path.join(base_path,'Worldpop','EUROPOP_WGS84.tif') 
 
+        # due to a few islands not included in the global worldpop data, we need to 
+        # extract their data individually
+        
+        islands = ['FJI','KIR','MHL','FSM','PLW','PNG','WSM','SLB','TON','VUT']
+        if country in islands:
+            temp_path = os.path.join(base_path,'Worldpop','temp_%s' % country)
+    
+            if not os.path.exists(temp_path):
+                os.makedirs(temp_path)
+    
+            unzip_worldpop(country,base_path,temp_path)
+            world_pop = os.path.join(temp_path,'popmap15adj.tif')
+            if country == 'KIR':
+                world_pop = os.path.join(temp_path,'popmap15adj_lzw.tif')
+            elif country == 'TON':
+                world_pop = os.path.join(temp_path,'popmap15.tif')
+            world_pop_out = os.path.join(temp_path,'popmap15adj_wgs84.tif')
+            os.system('gdalwarp -t_srs EPSG:4326 -tr 0.018 0.018 -overwrite '+world_pop+' '+world_pop_out)
+            world_pop = world_pop_out
+    
         # set path for global country shapes
         shp_world = os.path.join(base_path,'input_data','country_shapes.shp')
     
@@ -257,53 +358,37 @@ def get_RAI(country,continent_osm,base_path,grump,overwrite=True):
     # =============================================================================
         world_boundaries = gpd.read_file(shp_world)
         country_boundary = world_boundaries.loc[world_boundaries['ISO3166_1_'] == country]
+        country_boundary.crs = {'init' :'epsg:4326'}
     #    country_boundary = world_boundaries.loc[world_boundaries['ISO_Codes'] == country]
         country_boundary.to_file(shp_country)
-
-# =============================================================================
-#     """ create spatial index of urban areas for quick intersection """
-# =============================================================================
-        idx_urban = index.Index()
         
-        with fiona.open(grump) as shape_input:
-            i = 0
-    
-            for poly in shape_input:
-                idx_urban.insert(i, shape(poly['geometry']).bounds, poly)
-                i += 1
-
-
+        urban_geoms = gpd.read_file(grump)
+        urban_geoms.crs = {'init' :'epsg:4326'}
+        
     # =============================================================================
-    #     """ Remove urban areas from the country boundary file and save to shp """
+    #      """ Erase urban areas from the country shape  
     # =============================================================================
         
-        # get bounds of the country for the intersection with the rtree file
-        bounds = country_boundary['geometry'].bounds
-        bd_tuple = float(bounds['minx']),float(bounds['miny']),float(bounds['maxx']),float(bounds['maxy'])
-        
-        # we use the rtree file for this, to speed things up a bit
-        hits = [n.object for n in idx_urban.intersection(bd_tuple, objects=True)]
-    
-        # write the country urban areas to a geopandas dataframe
-    
-        urban_geoms = gpd.GeoDataFrame([['urban',shape(x['geometry'])] for x in hits])
-    
-        urban_geoms.columns = ['urban_area','geometry']
-        
+        if country_boundary['geometry'].values[0].geom_type == 'MultiPolygon':
+            ctry_boundary = gpd.GeoDataFrame([polygon for polygon in country_boundary['geometry'].values[0]],columns=['geometry'])
+            ctry_boundary = ctry_boundary.loc[ctry_boundary.geometry.area > 0.001]
+        else:
+            ctry_boundary = country_boundary
         # now get the rural areas of the country and save this to a shp
-        rural_country = gpd.overlay(country_boundary,urban_geoms,how='difference')
+        rural_country =  spatial_overlays(ctry_boundary, urban_geoms, how='difference')
+    #        rural_country = spatial_difference(ctry_boundary, urban_geoms)
         rural_country.to_file(rural_country_shp)
-    
+        
         """ Estimate the total population living in rural areas """
         stats_ctry = sum(item['sum'] for item in zonal_stats(rural_country,world_pop,
-                stats="sum") if item['sum'] is not None)        
+                stats="sum") if item['sum'] is not None)
     
     # =============================================================================
     #     """ Next step is to load roads of the country and create a buffer """
     # =============================================================================
        
         # load data, similar as when we estimate the length of the roads
-        load_country = get_country(country,continent_osm,base_path,overwrite)
+        load_country = get_country(country,continent_osm,base_path,overwrite,RAI=True)
        
         # if we include tertiary as well, we do a different filter
         if tertiary == True:
@@ -313,19 +398,28 @@ def get_RAI(country,continent_osm,base_path,grump,overwrite=True):
             
         # to find the buffer around a road, we convert it quickly to a utm
         # coordinate system to be able to do an exact 2km around the road (it 
-        # is a bit tricky to find this based on a coordinate sytem)
+        # is a bit tricky to find this based on a WGS84 coordinate sytem)
+        
+        if len(load_country) == 0:
+            if country in islands:
+                try:
+                    shutil.rmtree(temp_path, ignore_errors=True)
+                except:
+                    True
+            return {country: [stats_ctry,0,0]}
         
         country_centroid = country_boundary.centroid.values[0]
         lat,lon = country_centroid.bounds[1],country_centroid.bounds[0]
         
         # formula below based on :https://gis.stackexchange.com/a/190209/80697
         epsg=int(32700-np.round((45+lat)/90,0)*100+np.round((183+lon)/6,0))
-  
+      
         load_country = load_country.to_crs(epsg=epsg)
         
         # and do the actual buffer of 2km
         load_country['geometry'] = load_country.buffer(2000)
         
+        # and change the geodataframe back to WGS84 again
         load_country = load_country.to_crs(epsg=4326)
         
         # union this to one multipolygon and save to a shapefile
@@ -349,184 +443,96 @@ def get_RAI(country,continent_osm,base_path,grump,overwrite=True):
     #     """ Here we exlude urban areas from the road buffer file, similar as how
     #     we did it in the country boundary file """
     # =============================================================================
-        
-        # load files and overlay
-        roads_buffer = gpd.read_file(buffer_file)
-        rural_roads = gpd.overlay(roads_buffer,urban_geoms,how='difference')
-        
-        # and write to shapefile
-        rural_roads.to_file(buffer_rural)
+        try:
+            # load files and overlay
+            roads_buffer = gpd.GeoDataFrame(gpd.read_file(buffer_file)['geometry'])
+            roads_buffer.reset_index(inplace=True,drop=True)
+            rural_country.reset_index(inplace=True,drop=True)
+            rural_roads = spatial_overlays(roads_buffer, rural_country, how='intersection')
+            # and write to shapefile
+            rural_roads.to_file(buffer_rural)
+        except:
+            if country in islands:
+                try:
+                    shutil.rmtree(temp_path, ignore_errors=True)
+                except:
+                    True
+            return {country: [stats_ctry,0,0]}
+    
     
         """ Estimate the total rural population living within 2km of selected roads"""
         stats_roads = sum(item['sum'] for item in zonal_stats(buffer_rural,world_pop,
                 stats="sum") if item['sum'] is not None)   
+       
+        if country in islands:
+            try:
+                shutil.rmtree(temp_path, ignore_errors=True)
+            except:
+                True
         
         """ Return the total rural population, total population with 2km of 
         selected roads and the RAI"""
-        return {country: [stats_ctry,stats_roads,(stats_roads/stats_ctry)*100]}
-
-    except:
-        print('%s did not finish!' % country)
-
-def road_length(base_path,multiprocess=True,overwrite=True):
-    
-    """
-    Main function to estimate the length of all the roads we are interested in. 
-    
-    Args:
         
-        base_path: base path to location of all files and directories in this project.
+        if stats_roads == 0:
+            return {country: [stats_ctry,0,0]}
         
-        multiprocess: set to True by default. Set to False in the case of limited processing power.
-        
-        overwrite: set to True by default. This relates to all input data (i.e. .poly files, .osm.pbf files and shapefiles).
-        
-    Returns:
-        
-        an Excel file with the length of all primary, secondary, tertiary, track and other roads for each country.
-    
-    """
-    
-    print ('The calculation of road lenghts has started!')
-    start = time.time()
-
-# =============================================================================
-#     """ Set path to dirs"""
-# =============================================================================
-    dir_out = os.path.join(base_path,'output_data')
-    poly_dir = os.path.join(base_path,'poly_files')
-    osm_path_in = os.path.join(base_path,'osm_continent')
-
-# =============================================================================
-#     """ create directories if they are not created yet """
-# =============================================================================
-    if not os.path.exists(dir_out):
-         os.makedirs(dir_out)
-
-    if not os.path.exists(poly_dir):
-         os.makedirs(poly_dir)           
-
-    if not os.path.exists(osm_path_in):
-         os.makedirs(osm_path_in)     
-# =============================================================================
-#     """Set path to files we use """
-# =============================================================================
-    wb_country_in = os.path.join(base_path,'input_data','wbccodes2014.csv')
-    global_shape = os.path.join(base_path,'input_data','2015_GAUL_Dataset_Mod.gdb')
-
-# =============================================================================
-#     """Load country shapes and list and only save the required countries"""
-# =============================================================================
-    wb_country = pd.read_csv(wb_country_in,header=0,index_col=0)
-    
-    #filter high income countries from country file
-    country_list = wb_country[['country','continent']].loc[wb_country['wbregion']!='YHI']
-
-    # add column to country list so we can easily look up the required continental
-    # osm file for that continent    
-    map_continent = {'MA': 'central-america','SA': 'south-america','EU': 'europe','AS': 'asia',
-                     'AU': 'australia-oceania','AF':'africa','AM':'north-america'}
-   
-    country_list['osm-cont'] = country_list['continent'].map(lambda x: (map_continent[x])) 
-    
-# =============================================================================
-#     """ create .poly files to clip countries from osm.pbf files """
-# =============================================================================
-    if not os.listdir(poly_dir):
-        create_poly_files(base_path,global_shape,save_shapefile=overwrite)
-
-# =============================================================================
-# """ check if we have actually downloaded the openstreetmap input files. If not,
-# lets download them. Note: this will take a while! """ 
-# =============================================================================
-    continent_list = ['central-america','south-america','europe','asia','australia-oceania','africa','north-america']
-
-    for continent in continent_list:        
-        url = 'http://download.geofabrik.de/%s-latest.osm.pbf' % continent
-        if '%s-latest.osm.pbf' % (continent) not in  os.listdir(osm_path_in):
-            urllib.request.urlretrieve(url, osm_path_in)
+        stats =(stats_roads/stats_ctry)*100
+        if stats > 100:
+            stats = 100
             
-# =============================================================================
-#     """ create extracted osm files for each country per continent """
-# =============================================================================
-    out = []
-    countries = []
-    continent_osms = []
-    base_paths = []
-    for country in country_list.iterrows():
-        country = country[1]
-        continent_osm = os.path.join(osm_path_in,'%s-latest.osm.pbf' % (country['osm-cont']))
-        countries.append(country['country'])
-        continent_osms.append(continent_osm)
-        base_paths.append(base_path)
+        return {country: [stats_ctry,stats_roads,stats]}
 
-    # multiprocessing will start if set to True. Set to False with limited processing capacities    
-    if multiprocess==True:
-        pool = Pool(cpu_count()-1)
-        out = pool.starmap(country_road_length, zip(countries,continent_osms,base_paths,overwrite=overwrite)) 
-    
-    # when multiprocessing set to False, we will just loop over the countries.
-    else:
-        out = []
-        for country in country_list.iterrows():
-            country = country[1]
-            continent_osm = os.path.join(osm_path_in,'%s-latest.osm.pbf' % (country['osm-cont']))
-            out.append(country_road_length(country['country'],continent_osm,base_path,overwrite=overwrite))
-            
-    df = pd.concat(out,axis=1).T
-    
-    map_country = dict(zip(wb_country['country'],wb_country['country_name']))
-    df['Country'] = df.index.to_series().map(map_country)
+    except Exception as e: 
+        print(str(e)+' for %s' % country)
+        return {country: [0,0,0]}
 
-    df.set_index('Country',inplace=True,drop=True)
-    
-    writer = pd.ExcelWriter(os.path.join(dir_out,'dist_roads.xlsx'))
-    df.to_excel(writer,'output')
-    writer.save()
-    
-    end = time.time()
 
-    print('It took ' + str(np.float16((end - start))) + " seconds to finish!")         
-
-def country_road_length(country,continent_osm,base_path,overwrite=True):
-    
+def create_figure(country,load_country,base_path):
     """
-    Function to estimate the road length for each road segment.
-
-    Args:
-        country: to country for which we calculate the RAI.
-        
-        continent_osm: the continent that the country 'belongs' to. This is required in the osm extraction.
-        
-        base_path: base path to location of all files.
-        
-    Returns:
-        distance per road type (Primary, Secondary, Tertiary, Track, Other)
-        for the specified country as pandas Series
+    Create a figure of the road network
     """
-    try:
-        print('%s started!' % country)
+    # Create figure
+    plt.figure()
     
-    # =============================================================================
-    #     Load country road data
-    # =============================================================================
-        try:
-            load_country = get_country(country,continent_osm,base_path,overwrite=False)
-        except:
-            load_country = get_country(country,continent_osm,base_path,overwrite=True)
-            
-    # =============================================================================
-    #     Groupby aggregated road classifcation
-    # =============================================================================
-        dist_per_roadtype = load_country.groupby('roads').sum()
-        dist_per_roadtype.columns = [country]
-     
-    # =============================================================================
-    #     Return pandas Series with total road length in kilometers per road type
-    # =============================================================================
-        return dist_per_roadtype
-    except Exception as e: print(str(e)+' for %s' % country)
+    proj_lat_lon = ccrs.PlateCarree()
+    ax = plt.axes([0.0,0.0,1.0, 1.0] ,facecolor='#D0E3F4', projection=proj_lat_lon)
 
+    cmap = cm.get_cmap('Set1', 4) # Colour map (there are many others)
+    cmaplist = [cmap(i) for i in range(cmap.N)]
+#        cmap = cmap.from_list('Custom cmap', cmaplist, cmap.N)
+    cmap = mpl.colors.LinearSegmentedColormap.from_list('Custom cmap', cmaplist, cmap.N)
+
+    colors_legend = []
+    for i in range(cmap.N):
+        rgb = cmap(i)[:3] # will return rgba, we take only first 3 so we get rgb
+        colors_legend.append(mpl.colors.rgb2hex(rgb))
+
+    color1 =  Line2D([0], [0], linestyle="none", marker="o", markersize=10, markeredgewidth=0.0,markerfacecolor=colors_legend[0])
+    color2 =  Line2D([0], [0], linestyle="none", marker="o", markersize=10, markeredgewidth=0.0,markerfacecolor=colors_legend[1])
+    color3 =  Line2D([0], [0], linestyle="none", marker="o", markersize=10, markeredgewidth=0.0,markerfacecolor=colors_legend[2])
+    color4 =  Line2D([0], [0], linestyle="none", marker="o", markersize=10, markeredgewidth=0.0,markerfacecolor=colors_legend[3])
+
+    legend_handles=['primary','secondary','tertiary','track']
+    
+    map_linewidth = dict(zip(legend_handles,[0.8,0.5,0.3,0.1]))
+    
+    load_country = load_country.loc[load_country['roads'] != 'other']
+    lw_all = list(load_country['roads'].map(lambda x: (map_linewidth[x])) )
+    tot_bounds = list(load_country.total_bounds)
+    ax.set_extent([tot_bounds[0]-0.1,tot_bounds[2]+0.1,tot_bounds[1]-0.1,tot_bounds[3]+0.1] , crs=proj_lat_lon)
+    world = gpd.read_file('F:\Dropbox\WorldBank\input_data\country_shapes.shp')
+    world.plot(ax=ax,color='#FEF9E0',lw=0.3,edgecolor='k')
+               
+    load_country.plot(ax=ax,column='roads',linewidth=lw_all,categorical=True,legend=True,cmap=cmap)
+
+    ax.legend([color1,color2,color3,color4],legend_handles,numpoints=1, loc=1) 
+    ax.background_patch.set_facecolor('#D0E3F4')
+    
+    admin_name = world['ADM0_NAME'].loc[world['ISO3166_1_']==country].values[0]
+    plt.title('Road network of %s' % admin_name,fontweight='bold')
+
+    figure_out= os.path.join(base_path,'Figures','%s.png' % country)
+    plt.savefig(figure_out,dpi=500,bbox_inches='tight')
 
 def clip_osm(continent_osm,country_poly,country_pbf):
     """ Clip the country osm file from the larger continent (or planet) file and save to a new osm.pbf file. 
@@ -549,7 +555,6 @@ def clip_osm(continent_osm,country_poly,country_pbf):
 
     os.system('osmconvert64  '+continent_osm+' -B='+country_poly+' --complete-ways -o='+country_pbf)
 
-
 def extract_osm(country_shp,country_pbf):
     """Extract a shapefile with all the road information from the openstreetmap file.
     
@@ -566,7 +571,6 @@ def extract_osm(country_shp,country_pbf):
                \"SELECT highway FROM lines WHERE highway IS NOT NULL\" \
                -lco ENCODING=UTF-8 -skipfailures -nlt geometry "+country_shp+" "+country_pbf)    
         
-
 
 def line_length(line, ellipsoid='WGS-84'):
     """Length of a line in meters, given in geographic coordinates.
@@ -588,6 +592,27 @@ def line_length(line, ellipsoid='WGS-84'):
         vincenty(a, b, ellipsoid=ellipsoid).kilometers
         for a, b in pairwise(line.coords)
     )
+
+def unzip_worldpop(country,base_path,temp_path):
+ 
+    archiveman = r'7z' # 7z.exe comes with 7-zip
+
+    """Load file paths"""
+    poppath = os.path.join(base_path,'Worldpop')
+
+    islands = ['FJI','KIR','MHL','FSM','PLW','PNG','WSM','SLB','TON','VUT']
+    islands_full = ['Fiji','Kiribati','Marshall Islands','Micronesia (Federated States of)','Palau','Papua New Guinea','Samoa','Solomon Islands','Tonga','Vanuatu']
+
+    map_isl_names = dict(zip(islands,islands_full))
+
+    island_full_name = map_isl_names[country]
+    archive_name = os.path.join(poppath,'%s 100m Population.7z' % island_full_name)
+    if country == 'KIR':
+        _ = subprocess.check_output([archiveman, 'e','-aos', archive_name, '-o{}'.format(temp_path), 'popmap15adj_lzw.tif'])
+    elif country == 'TON':
+        _ = subprocess.check_output([archiveman, 'e','-aos', archive_name, '-o{}'.format(temp_path), 'popmap15.tif'])
+    else:
+        _ = subprocess.check_output([archiveman, 'e','-aos', archive_name, '-o{}'.format(temp_path), 'popmap15adj.tif'])
 
 def map_roads(load_country):
 
