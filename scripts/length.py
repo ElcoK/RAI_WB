@@ -14,18 +14,18 @@ import numpy as np
 def single_country(country,continent_osm,base_path,overwrite=True,savefig=False):
     
     """
-    Function to estimate the road length for each road segment.
+    Function to estimate the road length for each road segment in a country.
 
     Args:
-        country: to country for which we calculate the RAI.
+        *country* : The country for which we calculate the RAI.
         
-        continent_osm: the continent that the country 'belongs' to. This is required in the osm extraction.
+        *continent_osm* : The continent the country 'belongs' to. This is required for the osm extraction.
         
-        base_path: base path to location of all files.
+        *base_path* : Base path to location of all files.
         
     Returns:
-        distance per road type (Primary, Secondary, Tertiary, Track, Other)
-        for the specified country as pandas Series
+        The distance per road type (**Primary**, **Secondary**, **Tertiary**, **Track**, **Other**)
+        for the specified country as pandas Series.
     """
     try:
         print('%s started!' % country)
@@ -61,18 +61,18 @@ def all_countries(base_path,multiprocess=True,overwrite=True,savefig=False):
     
     """
     Main function to estimate the length of all the roads and countries we are interested in. 
-    
+
     Args:
+        *base_path* : Base path to the location of all files and directories in this project.
         
-        base_path: base path to location of all files and directories in this project.
+        *multiprocess* : Set to True by default. Set to False in the case of limited processing power.
         
-        multiprocess: set to True by default. Set to False in the case of limited processing power.
-        
-        overwrite: set to True by default. This relates to all input data (i.e. .poly files, .osm.pbf files and shapefiles).
-        
+        *overwrite* : Set to True by default. This relates to all input data (i.e. .poly files, .osm.pbf files and shapefiles).
+
+        *savefig* : Set to False by default. When set to True, it will return a figure with the roads of a country.
+
     Returns:
-        
-        an Excel file with the length of all primary, secondary, tertiary, track and other roads for each country.
+        An Excel file with the length of all **Primary**, **Secondary**, **Tertiary**, **Track** and **Other** roads for each country.
     
     """
     
