@@ -1,0 +1,17 @@
+name: RAI_WB
+   dependencies:
+        - python=3.6
+        - gdal
+        - numpy
+        - pandas
+        - shapely
+        - fiona
+        - geopy
+        - rtree
+        - geopandas
+        - pathos
+        - rasterio
+        - rasterstats
+        - boltons
+        - matplotlib
+        - cartopy
