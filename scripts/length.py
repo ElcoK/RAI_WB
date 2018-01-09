@@ -11,7 +11,7 @@ import pandas as pd
 from functions import create_poly_files,get_country,create_figure
 import numpy as np
 
-def single_country(country,continent_osm,base_path,overwrite=True,savefig=False):
+def single_country(country,continent_osm,base_path,overwrite=True,savefig=False,report=False):
     
     """
     Function to estimate the road length for each road segment in a country.
@@ -57,7 +57,7 @@ def single_country(country,continent_osm,base_path,overwrite=True,savefig=False)
     except Exception as e: print(str(e)+' for %s' % country)
 
 
-def all_countries(base_path,multiprocess=True,overwrite=True,savefig=False):
+def all_countries(base_path,multiprocess=True,overwrite=True,savefig=False,report=False):
     
     """
     Main function to estimate the length of all the roads and countries we are interested in. 
@@ -147,6 +147,7 @@ def all_countries(base_path,multiprocess=True,overwrite=True,savefig=False):
     base_paths = []
     overwrites = []
     savefigs = []
+    reporting = []
     for country in country_list.iterrows():
         country = country[1]
         continent_osm = os.path.join(osm_path_in,'%s-latest.osm.pbf' % (country['osm-cont']))
@@ -155,11 +156,12 @@ def all_countries(base_path,multiprocess=True,overwrite=True,savefig=False):
         base_paths.append(base_path)
         overwrites.append(overwrite)
         savefigs.append(savefig)
+        reporting.append(report)
 
     # multiprocessing will start if set to True. Set to False with limited processing capacities    
     if multiprocess==True:
         pool = Pool(cpu_count()-1)
-        out = pool.starmap(single_country, zip(countries,continent_osms,base_paths,overwrites,savefigs)) 
+        out = pool.starmap(single_country, zip(countries,continent_osms,base_paths,overwrites,savefigs,reporting)) 
     
     # when multiprocessing set to False, we will just loop over the countries.
     else:
@@ -168,7 +170,7 @@ def all_countries(base_path,multiprocess=True,overwrite=True,savefig=False):
         for country in country_list.iterrows():
             country = country[1]
             continent_osm = os.path.join(osm_path_in,'%s-latest.osm.pbf' % (country['osm-cont']))
-            out.append(single_country(country['country'],continent_osm,base_path,overwrites[i],savefigs[i]))
+            out.append(single_country(country['country'],continent_osm,base_path,overwrites[i],savefigs[i],reporting[i]))
             i += 1
             
     df = pd.concat(out,axis=1).T
