@@ -6,7 +6,7 @@ This small example will show how to estimate the length of the roads in a single
 
 The first step is to load the function *single_country* from the *length* file.
 
-.. code:: ipython3
+.. parsed-literal::
 
     from length import single_country
     import os
@@ -15,20 +15,20 @@ The first step is to load the function *single_country* from the *length* file.
 The **single_country** function requires a *base_path*, the country's name and a path string to the osm file of the continent. We will first identify the *base_path*. The two dots indicate that the base_path redirects us to the parent directory.
 
 
-.. code:: ipython3
+.. parsed-literal::
 
     base_path =   os.path.join(os.path.dirname("__file__"),'..')
 
 For this example, we will use Jamaica.
 
-.. code:: ipython3
+.. parsed-literal::
 
     country = 'JAM'
     continent_osm = os.path.join(base_path,'osm_continent','%s-latest.osm.pbf' % ('central-america'))
 
 And finally, we run the code.
 
-.. code:: ipython3
+.. parsed-literal::
 
     single_country(country,continent_osm,base_path,overwrite=False,savefig=True)
 
