@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Rural Accessbility Index &mdash; Worldbank Rural Acessibility Index 0.1.1 documentation</title>
+  <title>Rural Accessbility Index (RAI) &mdash; Worldbank Rural Acessibility Index 0.2.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Worldbank Rural Acessibility Index 0.1.1 documentation" href="index.html"/>
+    <link rel="top" title="Worldbank Rural Acessibility Index 0.2.0 documentation" href="index.html"/>
         <link rel="prev" title="Road length per country" href="Road_lenght.html"/> 
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.1
+                0.2
               </div>
             
           
@@ -94,8 +94,9 @@
 <li class="toctree-l1"><a class="reference internal" href="readme.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="General.html">General functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Road_lenght.html">Road length per country</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Rural Accessbility Index</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#get-rural-accessiblity-index-rai">Get Rural Accessiblity Index (RAI)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Rural Accessbility Index (RAI)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#single-country">Single country</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#all-countries">All countries</a></li>
 </ul>
 </li>
 </ul>
@@ -142,7 +143,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Rural Accessbility Index</li>
+      <li>Rural Accessbility Index (RAI)</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -161,13 +162,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="rural-accessbility-index">
-<h1>Rural Accessbility Index<a class="headerlink" href="#rural-accessbility-index" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="get-rural-accessiblity-index-rai">
-<h2>Get Rural Accessiblity Index (RAI)<a class="headerlink" href="#get-rural-accessiblity-index-rai" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="rural-accessbility-index-rai">
+<h1>Rural Accessbility Index (RAI)<a class="headerlink" href="#rural-accessbility-index-rai" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="single-country">
+<h2>Single country<a class="headerlink" href="#single-country" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt>
-<code class="descclassname">scripts.functions.</code><code class="descname">get_RAI</code><span class="sig-paren">(</span><em>country</em>, <em>continent_osm</em>, <em>base_path</em>, <em>grump</em>, <em>overwrite=False</em>, <em>tertiary=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#get_RAI"><span class="viewcode-link">[source]</span></a></dt>
+<code class="descclassname">scripts.RAI.</code><code class="descname">single_country</code><span class="sig-paren">(</span><em>country</em>, <em>continent_osm</em>, <em>base_path</em>, <em>grump</em>, <em>overwrite=False</em>, <em>tertiary=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/RAI.html#single_country"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Estimation of the Rural Accesibility Index (RAI) for the specified country.</p>
 <p>The RAI is calculated by using the methodology specified in the report below:</p>
 <blockquote>
@@ -175,14 +176,33 @@
 Washington, D.C. : World Bank Group.  <a class="reference external" href="http://bit.ly/2p5asME">http://bit.ly/2p5asME</a></div></blockquote>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd><p class="first">country: to country for which we calculate the RAI.</p>
-<p>continent_osm: the continent that the country ‘belongs’ to. This is required in the osm extraction.</p>
-<p>base_path: base path to location of all files.</p>
-<p>idx_urban: rTree index of the urban areas. By using an rtree index, we can quickly find the intersecting areas.</p>
-<p class="last">tertiary: default option is ‘False’, but if we want to estimate the RAI for tertiary roads as well, we can set this option to ‘True’.</p>
+<dd><p class="first"><em>country</em> : The country for which we calculate the RAI.</p>
+<p><em>continent_osm</em> : The continent the country ‘belongs’ to. This is required for the osm extraction.</p>
+<p><em>base_path</em> : The base path to the location of all files and scripts.</p>
+<p><em>grump</em> : The path string to the grump (global urban areas) shapefile.</p>
+<p class="last"><em>tertiary</em> : The default option is ‘False’, but if we want to estimate the RAI for tertiary roads as well, we can set this option to ‘True’.</p>
 </dd>
 <dt>Returns:</dt>
-<dd>A dictionary with the country name as the key and the total rural population, total population with 2km of selected roads and the RAI as values.</dd>
+<dd>A dictionary with the <strong>country name</strong> as the key and the <strong>total rural population</strong>, the <strong>total rural population within 2km of the selected roads</strong> and the <strong>RAI</strong> as values.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="all-countries">
+<h2>All countries<a class="headerlink" href="#all-countries" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="descclassname">scripts.RAI.</code><code class="descname">all_countries</code><span class="sig-paren">(</span><em>base_path</em>, <em>multiprocess=True</em>, <em>overwrite=True</em>, <em>tertiary=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/RAI.html#all_countries"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Main function to estimate the <strong>RAI</strong> for all the countries we are interested in.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first"><em>base_path</em> : Base path to the location of all files and directories in this project.</p>
+<p><em>multiprocess</em> : Set to True by default. Set to False in the case of limited processing power.</p>
+<p><em>overwrite</em> : Set to True by default. This relates to all input data (i.e. .poly files, .osm.pbf files and shapefiles).</p>
+<p class="last"><em>tertiary</em> : Set to False by default. When set to True, the calculation of the <strong>RAI</strong> will run a second time, now including tertiary roads.</p>
+</dd>
+<dt>Returns:</dt>
+<dd>An Excel file the <strong>total rural population</strong>, the <strong>total rural population within 2km of the selected roads</strong> and the <strong>RAI</strong> for each country. if <em>tertiary</em> is set to True, the Excel file will return an additional sheet with the results of that second calculation.</dd>
 </dl>
 </dd></dl>
 
@@ -231,7 +251,7 @@ Washington, D.C. : World Bank Group.  <a class="reference external" href="http:/
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1.1',
+            VERSION:'0.2.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

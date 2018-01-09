@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>scripts.length &mdash; Worldbank Rural Acessibility Index 0.1.1 documentation</title>
+  <title>scripts.length &mdash; Worldbank Rural Acessibility Index 0.2.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="Worldbank Rural Acessibility Index 0.1.1 documentation" href="../../index.html"/>
+    <link rel="top" title="Worldbank Rural Acessibility Index 0.2.0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.1
+                0.2
               </div>
             
           
@@ -94,7 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../General.html">General functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Road_lenght.html">Road length per country</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../RAI.html">Rural Accessbility Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RAI.html">Rural Accessbility Index (RAI)</a></li>
 </ul>
 
             
@@ -175,18 +175,18 @@
 <div class="viewcode-block" id="single_country"><a class="viewcode-back" href="../../Road_lenght.html#scripts.length.single_country">[docs]</a><span class="k">def</span> <span class="nf">single_country</span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="n">continent_osm</span><span class="p">,</span><span class="n">base_path</span><span class="p">,</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">savefig</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Function to estimate the road length for each road segment.</span>
+<span class="sd">    Function to estimate the road length for each road segment in a country.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        country: to country for which we calculate the RAI.</span>
+<span class="sd">        *country* : The country for which we calculate the RAI.</span>
 <span class="sd">        </span>
-<span class="sd">        continent_osm: the continent that the country &#39;belongs&#39; to. This is required in the osm extraction.</span>
+<span class="sd">        *continent_osm* : The continent the country &#39;belongs&#39; to. This is required for the osm extraction.</span>
 <span class="sd">        </span>
-<span class="sd">        base_path: base path to location of all files.</span>
+<span class="sd">        *base_path* : Base path to location of all files.</span>
 <span class="sd">        </span>
 <span class="sd">    Returns:</span>
-<span class="sd">        distance per road type (Primary, Secondary, Tertiary, Track, Other)</span>
-<span class="sd">        for the specified country as pandas Series</span>
+<span class="sd">        The distance per road type (**Primary**, **Secondary**, **Tertiary**, **Track**, **Other**)</span>
+<span class="sd">        for the specified country as pandas Series.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> started!&#39;</span> <span class="o">%</span> <span class="n">country</span><span class="p">)</span>
@@ -222,18 +222,18 @@
     
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main function to estimate the length of all the roads and countries we are interested in. </span>
-<span class="sd">    </span>
+
 <span class="sd">    Args:</span>
+<span class="sd">        *base_path* : Base path to the location of all files and directories in this project.</span>
 <span class="sd">        </span>
-<span class="sd">        base_path: base path to location of all files and directories in this project.</span>
+<span class="sd">        *multiprocess* : Set to True by default. Set to False in the case of limited processing power.</span>
 <span class="sd">        </span>
-<span class="sd">        multiprocess: set to True by default. Set to False in the case of limited processing power.</span>
-<span class="sd">        </span>
-<span class="sd">        overwrite: set to True by default. This relates to all input data (i.e. .poly files, .osm.pbf files and shapefiles).</span>
-<span class="sd">        </span>
+<span class="sd">        *overwrite* : Set to True by default. This relates to all input data (i.e. .poly files, .osm.pbf files and shapefiles).</span>
+
+<span class="sd">        *savefig* : Set to False by default. When set to True, it will return a figure with the roads of a country.</span>
+
 <span class="sd">    Returns:</span>
-<span class="sd">        </span>
-<span class="sd">        an Excel file with the length of all primary, secondary, tertiary, track and other roads for each country.</span>
+<span class="sd">        An Excel file with the length of all **Primary**, **Secondary**, **Tertiary**, **Track** and **Other** roads for each country.</span>
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
@@ -382,7 +382,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.1.1',
+            VERSION:'0.2.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

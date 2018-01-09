@@ -1,9 +1,14 @@
 
-=========================
-Rural Accessbility Index
-=========================
+==============================
+Rural Accessbility Index (RAI)
+==============================
 
-Get Rural Accessiblity Index (RAI) 
+Single country
 -----------------------------------------
-.. autofunction:: scripts.functions.get_RAI
+.. autofunction:: scripts.RAI.single_country
+   :noindex:
+
+All countries
+-----------------------------------------
+.. autofunction:: scripts.RAI.all_countries
    :noindex:

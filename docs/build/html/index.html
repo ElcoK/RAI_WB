@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Documentation for RAI estimation &mdash; Worldbank Rural Acessibility Index 0.1.1 documentation</title>
+  <title>Documentation for RAI estimation &mdash; Worldbank Rural Acessibility Index 0.2.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Worldbank Rural Acessibility Index 0.1.1 documentation" href="#"/>
+    <link rel="top" title="Worldbank Rural Acessibility Index 0.2.0 documentation" href="#"/>
         <link rel="next" title="Getting started" href="readme.html"/> 
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.1
+                0.2
               </div>
             
           
@@ -94,7 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="readme.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="General.html">General functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Road_lenght.html">Road length per country</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RAI.html">Rural Accessbility Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RAI.html">Rural Accessbility Index (RAI)</a></li>
 </ul>
 
             
@@ -175,18 +175,21 @@
 <li class="toctree-l2"><a class="reference internal" href="General.html#do-a-spatial-overlay">Do a spatial overlay</a></li>
 <li class="toctree-l2"><a class="reference internal" href="General.html#get-country-file">Get country file</a></li>
 <li class="toctree-l2"><a class="reference internal" href="General.html#save-a-map-of-the-roads-of-a-country">Save a map of the roads of a country</a></li>
-<li class="toctree-l2"><a class="reference internal" href="General.html#clip-country-in-openstreetmap">Clip country in Openstreetmap</a></li>
-<li class="toctree-l2"><a class="reference internal" href="General.html#extract-country-from-openstreetmap">Extract country from Openstreetmap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="General.html#estimate-length-of-line">Estimate length of line</a></li>
 <li class="toctree-l2"><a class="reference internal" href="General.html#map-to-aggregate-set-of-roads">Map to aggregate set of roads</a></li>
+<li class="toctree-l2"><a class="reference internal" href="General.html#extract-country-from-openstreetmap">Extract country from Openstreetmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="General.html#clip-country-in-openstreetmap">Clip country in Openstreetmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="General.html#unzip-worldpop-data-from-7zip-file">Unzip worldpop data from 7zip file</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Road_lenght.html">Road length per country</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Road_lenght.html#get-country-road-length">Get country road length</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Road_lenght.html#single-country">Single country</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Road_lenght.html#all-countries">All countries</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="RAI.html">Rural Accessbility Index</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="RAI.html#get-rural-accessiblity-index-rai">Get Rural Accessiblity Index (RAI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RAI.html">Rural Accessbility Index (RAI)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RAI.html#single-country">Single country</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RAI.html#all-countries">All countries</a></li>
 </ul>
 </li>
 </ul>
@@ -235,7 +238,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1.1',
+            VERSION:'0.2.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

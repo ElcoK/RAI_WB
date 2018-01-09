@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Road length per country &mdash; Worldbank Rural Acessibility Index 0.1.1 documentation</title>
+  <title>Road length per country &mdash; Worldbank Rural Acessibility Index 0.2.0 documentation</title>
   
 
   
@@ -35,8 +35,8 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Worldbank Rural Acessibility Index 0.1.1 documentation" href="index.html"/>
-        <link rel="next" title="Rural Accessbility Index" href="RAI.html"/>
+    <link rel="top" title="Worldbank Rural Acessibility Index 0.2.0 documentation" href="index.html"/>
+        <link rel="next" title="Rural Accessbility Index (RAI)" href="RAI.html"/>
         <link rel="prev" title="General functions" href="General.html"/> 
 
   
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                0.1
+                0.2
               </div>
             
           
@@ -95,10 +95,11 @@
 <li class="toctree-l1"><a class="reference internal" href="readme.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="General.html">General functions</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Road length per country</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#get-country-road-length">Get country road length</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#single-country">Single country</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#all-countries">All countries</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="RAI.html">Rural Accessbility Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RAI.html">Rural Accessbility Index (RAI)</a></li>
 </ul>
 
             
@@ -164,37 +165,41 @@
             
   <div class="section" id="road-length-per-country">
 <h1>Road length per country<a class="headerlink" href="#road-length-per-country" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="get-country-road-length">
-<h2>Get country road length<a class="headerlink" href="#get-country-road-length" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="single-country">
+<h2>Single country<a class="headerlink" href="#single-country" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt>
 <code class="descclassname">scripts.length.</code><code class="descname">single_country</code><span class="sig-paren">(</span><em>country</em>, <em>continent_osm</em>, <em>base_path</em>, <em>overwrite=True</em>, <em>savefig=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/length.html#single_country"><span class="viewcode-link">[source]</span></a></dt>
-<dd><p>Function to estimate the road length for each road segment.</p>
+<dd><p>Function to estimate the road length for each road segment in a country.</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd><p class="first">country: to country for which we calculate the RAI.</p>
-<p>continent_osm: the continent that the country ‘belongs’ to. This is required in the osm extraction.</p>
-<p class="last">base_path: base path to location of all files.</p>
+<dd><p class="first"><em>country</em> : The country for which we calculate the RAI.</p>
+<p><em>continent_osm</em> : The continent the country ‘belongs’ to. This is required for the osm extraction.</p>
+<p class="last"><em>base_path</em> : Base path to location of all files.</p>
 </dd>
 <dt>Returns:</dt>
-<dd>distance per road type (Primary, Secondary, Tertiary, Track, Other)
-for the specified country as pandas Series</dd>
+<dd>The distance per road type (<strong>Primary</strong>, <strong>Secondary</strong>, <strong>Tertiary</strong>, <strong>Track</strong>, <strong>Other</strong>)
+for the specified country as pandas Series.</dd>
 </dl>
 </dd></dl>
 
+</div>
+<div class="section" id="all-countries">
+<h2>All countries<a class="headerlink" href="#all-countries" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt>
 <code class="descclassname">scripts.length.</code><code class="descname">all_countries</code><span class="sig-paren">(</span><em>base_path</em>, <em>multiprocess=True</em>, <em>overwrite=True</em>, <em>savefig=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/length.html#all_countries"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Main function to estimate the length of all the roads and countries we are interested in.</p>
-<p>Args:</p>
-<blockquote>
-<div><p>base_path: base path to location of all files and directories in this project.</p>
-<p>multiprocess: set to True by default. Set to False in the case of limited processing power.</p>
-<p>overwrite: set to True by default. This relates to all input data (i.e. .poly files, .osm.pbf files and shapefiles).</p>
-</div></blockquote>
-<p>Returns:</p>
-<blockquote>
-<div>an Excel file with the length of all primary, secondary, tertiary, track and other roads for each country.</div></blockquote>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first"><em>base_path</em> : Base path to the location of all files and directories in this project.</p>
+<p><em>multiprocess</em> : Set to True by default. Set to False in the case of limited processing power.</p>
+<p><em>overwrite</em> : Set to True by default. This relates to all input data (i.e. .poly files, .osm.pbf files and shapefiles).</p>
+<p class="last"><em>savefig</em> : Set to False by default. When set to True, it will return a figure with the roads of a country.</p>
+</dd>
+<dt>Returns:</dt>
+<dd>An Excel file with the length of all <strong>Primary</strong>, <strong>Secondary</strong>, <strong>Tertiary</strong>, <strong>Track</strong> and <strong>Other</strong> roads for each country.</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -210,7 +215,7 @@ for the specified country as pandas Series</dd>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="RAI.html" class="btn btn-neutral float-right" title="Rural Accessbility Index" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="RAI.html" class="btn btn-neutral float-right" title="Rural Accessbility Index (RAI)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="General.html" class="btn btn-neutral" title="General functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -244,7 +249,7 @@ for the specified country as pandas Series</dd>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1.1',
+            VERSION:'0.2.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

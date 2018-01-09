@@ -17,7 +17,7 @@ In case of no access to the GitHub page, the other option would be to copy-paste
 	
    .. code::
 
-		name: py36
+		name: RAI_WB
 		   dependencies:
 			- python=3.6
 			- gdal
