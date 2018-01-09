@@ -19,7 +19,7 @@ The **single_country** function requires a *base_path*, the country's name and a
 
     base_path =   os.path.join(os.path.dirname("__file__"),'..')
 
-For this example, we will use Jamaica.
+For this example, we will use Jamaica. The input for a country is its ISO3 classification.
 
 .. parsed-literal::
 
