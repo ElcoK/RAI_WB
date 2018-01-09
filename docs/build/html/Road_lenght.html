@@ -168,22 +168,7 @@
 <h2>Get country road length<a class="headerlink" href="#get-country-road-length" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt>
-<code class="descclassname">scripts.functions.</code><code class="descname">road_length</code><span class="sig-paren">(</span><em>base_path</em>, <em>multiprocess=True</em>, <em>overwrite=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#road_length"><span class="viewcode-link">[source]</span></a></dt>
-<dd><p>Main function to estimate the length of all the roads we are interested in.</p>
-<p>Args:</p>
-<blockquote>
-<div><p>base_path: base path to location of all files and directories in this project.</p>
-<p>multiprocess: set to True by default. Set to False in the case of limited processing power.</p>
-<p>overwrite: set to True by default. This relates to all input data (i.e. .poly files, .osm.pbf files and shapefiles).</p>
-</div></blockquote>
-<p>Returns:</p>
-<blockquote>
-<div>an Excel file with the length of all primary, secondary, tertiary, track and other roads for each country.</div></blockquote>
-</dd></dl>
-
-<dl class="function">
-<dt>
-<code class="descclassname">scripts.functions.</code><code class="descname">country_road_length</code><span class="sig-paren">(</span><em>country</em>, <em>continent_osm</em>, <em>base_path</em>, <em>overwrite=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#country_road_length"><span class="viewcode-link">[source]</span></a></dt>
+<code class="descclassname">scripts.length.</code><code class="descname">single_country</code><span class="sig-paren">(</span><em>country</em>, <em>continent_osm</em>, <em>base_path</em>, <em>overwrite=True</em>, <em>savefig=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/length.html#single_country"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Function to estimate the road length for each road segment.</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -195,6 +180,21 @@
 <dd>distance per road type (Primary, Secondary, Tertiary, Track, Other)
 for the specified country as pandas Series</dd>
 </dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descclassname">scripts.length.</code><code class="descname">all_countries</code><span class="sig-paren">(</span><em>base_path</em>, <em>multiprocess=True</em>, <em>overwrite=True</em>, <em>savefig=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/length.html#all_countries"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Main function to estimate the length of all the roads and countries we are interested in.</p>
+<p>Args:</p>
+<blockquote>
+<div><p>base_path: base path to location of all files and directories in this project.</p>
+<p>multiprocess: set to True by default. Set to False in the case of limited processing power.</p>
+<p>overwrite: set to True by default. This relates to all input data (i.e. .poly files, .osm.pbf files and shapefiles).</p>
+</div></blockquote>
+<p>Returns:</p>
+<blockquote>
+<div>an Excel file with the length of all primary, secondary, tertiary, track and other roads for each country.</div></blockquote>
 </dd></dl>
 
 </div>

@@ -8,12 +8,20 @@ Create .poly files
 .. autofunction:: scripts.functions.create_poly_files
    :noindex:
 
+Do a spatial overlay
+-----------------------------------------
+.. autofunction:: scripts.functions.spatial_overlays
+   :noindex:
    
 Get country file
 -----------------------------------------
 .. autofunction:: scripts.functions.get_country
    :noindex:
 
+Save a map of the roads of a country
+-----------------------------------------
+.. autofunction:: scripts.functions.create_figure
+   :noindex:
    
 Clip country in Openstreetmap
 -----------------------------------------

@@ -95,7 +95,9 @@
 <li class="toctree-l1"><a class="reference internal" href="readme.html">Getting started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">General functions</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#create-poly-files">Create .poly files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#do-a-spatial-overlay">Do a spatial overlay</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#get-country-file">Get country file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#save-a-map-of-the-roads-of-a-country">Save a map of the roads of a country</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#clip-country-in-openstreetmap">Clip country in Openstreetmap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#extract-country-from-openstreetmap">Extract country from Openstreetmap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#estimate-length-of-line">Estimate length of line</a></li>
@@ -176,6 +178,7 @@
 <code class="descclassname">scripts.functions.</code><code class="descname">create_poly_files</code><span class="sig-paren">(</span><em>base_path</em>, <em>global_shape</em>, <em>save_shapefile=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#create_poly_files"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>This function will create the .poly files from the world shapefile. These
 .poly files are used to extract data from the openstreetmap files.</p>
+<p>This function is adapted from the OSMPoly function in QGIS.</p>
 <dl class="docutils">
 <dt>Args:</dt>
 <dd><p class="first">base_path: base path to location of all files.</p>
@@ -188,11 +191,30 @@
 </dd></dl>
 
 </div>
+<div class="section" id="do-a-spatial-overlay">
+<h2>Do a spatial overlay<a class="headerlink" href="#do-a-spatial-overlay" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="descclassname">scripts.functions.</code><code class="descname">spatial_overlays</code><span class="sig-paren">(</span><em>df1</em>, <em>df2</em>, <em>how='intersection'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#spatial_overlays"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Compute overlay intersection of two GeoPandasDataFrames df1 and df2. This
+function is much faster compared to the original geopandas overlay method</p>
+<p>Adapted from <a class="reference external" href="https://github.com/geopandas/geopandas/issues/400">https://github.com/geopandas/geopandas/issues/400</a></p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">df1: dataframe to be either intersected or ‘erased’, using the difference function.</p>
+<p class="last">df2: dataframe to intersect or to erase, using the difference function.</p>
+</dd>
+<dt>Return:</dt>
+<dd>df1: an either intersected or (partly) erased geopandas dataframe.</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="get-country-file">
 <h2>Get country file<a class="headerlink" href="#get-country-file" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt>
-<code class="descclassname">scripts.functions.</code><code class="descname">get_country</code><span class="sig-paren">(</span><em>country</em>, <em>continent_osm</em>, <em>base_path</em>, <em>overwrite=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#get_country"><span class="viewcode-link">[source]</span></a></dt>
+<code class="descclassname">scripts.functions.</code><code class="descname">get_country</code><span class="sig-paren">(</span><em>country</em>, <em>continent_osm</em>, <em>base_path</em>, <em>overwrite=False</em>, <em>RAI=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#get_country"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Extraction of the road data for the specified country from OSM. We use the continental OSM file, downloaded from <a class="reference external" href="http://download.geofabrik.de">http://download.geofabrik.de</a>.</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -201,11 +223,22 @@
 <dt>continent_osm: the continent that the country ‘belongs’ to. This is </dt>
 <dd>required in the osm extraction.</dd>
 </dl>
-<p class="last">base_path: base path to location of all files.</p>
+<p>base_path: base path to location of all files.</p>
+<p>overwrite: this is set on True by default, set on False if you are sure the input files are correct (it will save a lot of computation time).</p>
+<p class="last">RAI: this is set on False by default. set on True if this country extracting is used for the RAI analysis. It will skip the road length calculation (saving computation time).</p>
 </dd>
 <dt>Returns:</dt>
 <dd>load_country: a geodataframe containing all the roads and their length.</dd>
 </dl>
+</dd></dl>
+
+</div>
+<div class="section" id="save-a-map-of-the-roads-of-a-country">
+<h2>Save a map of the roads of a country<a class="headerlink" href="#save-a-map-of-the-roads-of-a-country" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="descclassname">scripts.functions.</code><code class="descname">create_figure</code><span class="sig-paren">(</span><em>country</em>, <em>load_country</em>, <em>base_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/functions.html#create_figure"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Create a figure of the road network</p>
 </dd></dl>
 
 </div>
