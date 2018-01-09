@@ -32,4 +32,7 @@ In case of no access to the GitHub page, the other option would be to copy-paste
 			- rasterio
 			- rasterstats
 			- boltons
+			- matplotlib
+			- cartopy
+
 	

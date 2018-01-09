@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 import mock
 
 MOCK_MODULES = ['osgeo.gdal','numpy', 'pandas', 'urllib.request', 'shapely','shapely.geometry', 'fiona', 'geopy.distance', 'rtree', 'geopandas', 'pathos.multiprocess', 'rasterio','rasterstats',
-				'boltons.iterutils','cartopy','matplotlib','matplotlib.pyplot','matplotlib.lines','functions']
+				'boltons.iterutils','cartopy','matplotlib','matplotlib.pyplot','matplotlib.lines','functions','multiprocess']
 				
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
