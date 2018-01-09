@@ -15,7 +15,7 @@ import shutil
 import warnings
 from functools import reduce
 
-import cartopy.crs as ccrs
+import cartopy
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -494,7 +494,7 @@ def create_figure(country,load_country,base_path):
     # Create figure
     plt.figure()
     
-    proj_lat_lon = ccrs.PlateCarree()
+    proj_lat_lon = cartopy.crs.PlateCarree()
     ax = plt.axes([0.0,0.0,1.0, 1.0] ,facecolor='#D0E3F4', projection=proj_lat_lon)
 
     cmap = cm.get_cmap('Set1', 4) # Colour map (there are many others)
