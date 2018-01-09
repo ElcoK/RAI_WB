@@ -3,9 +3,9 @@
 Getting started
 =========================
 
-Recommended option is to use a `Miniconda <https://conda.io/miniconda.html>`_ environment to work in for this project, relying on conda to handle some of the trickier library dependencies.
+The recommended option is to create a virtual environment using `Miniconda <https://conda.io/miniconda.html>`_. 
 
-The most easiest way to do so is to use the requirements.yml file as provided in the github page. 
+The easiest way to create a virtual environment for this project is to use the *requirements.yml* file as provided on the GitHub page of this project. 
 
 *To create the environment using the yaml file:*
 
