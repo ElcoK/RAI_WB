@@ -17,7 +17,8 @@ Note that the explanation of the functions in this reference guide is mainly foc
    :maxdepth: 2
    :caption: Documentation
  
-   readme	
+   readme
+   Example
    General
    Road_lenght
    RAI
