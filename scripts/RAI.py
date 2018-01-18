@@ -18,7 +18,7 @@ from multiprocess import Pool , cpu_count
 import urllib.request
 import pandas as pd
 
-def single_country(country,continent_osm,base_path,grump,overwrite=False,tertiary=False):
+def single_country(country,continent_osm,base_path,grump,overwrite=False,tertiary=False,track=False):
 
     """
     Estimation of the Rural Accesibility Index (RAI) for the specified country.
@@ -29,18 +29,20 @@ def single_country(country,continent_osm,base_path,grump,overwrite=False,tertiar
         Washington, D.C. : World Bank Group.  http://bit.ly/2p5asME 
     
     Args:
-        *country* : The country for which we calculate the RAI.
+        country: to country for which we calculate the RAI.
         
-        *continent_osm* : The continent the country 'belongs' to. This is required for the osm extraction.
+        continent_osm: the continent that the country 'belongs' to. This is required in the osm extraction.
         
-        *base_path* : The base path to the location of all files and scripts.
+        base_path: base path to location of all files.
         
-        *grump* : The path string to the grump (global urban areas) shapefile.
+        idx_urban: rTree index of the urban areas. By using an rtree index, we can quickly find the intersecting areas.
         
-        *tertiary* : The default option is 'False', but if we want to estimate the RAI for tertiary roads as well, we can set this option to 'True'.
+        tertiary: default option is 'False', but if we want to estimate the RAI for tertiary roads as well, we can set this option to 'True'.
+
+        track: default option is 'False', but if we want to estimate the RAI for both tracks and tertiary roads as well, we can set this option to 'True'.
         
     Returns:
-        A dictionary with the **country name** as the key and the **total rural population**, the **total rural population within 2km of the selected roads** and the **RAI** as values.
+        A dictionary with the country name as the key and the total rural population, total population with 2km of selected roads and the RAI as values.
     """ 
     try:
     
@@ -84,15 +86,18 @@ def single_country(country,continent_osm,base_path,grump,overwrite=False,tertiar
             world_pop_out = os.path.join(temp_path,'popmap15adj_wgs84.tif')
             os.system('gdalwarp -t_srs EPSG:4326 -tr 0.018 0.018 -overwrite '+world_pop+' '+world_pop_out)
             world_pop = world_pop_out
-    
+
+        if country == 'MEX':
+            world_pop = os.path.join(base_path,'Worldpop','MEX_ppp_v2c_2015_UNadj.tif')   
+        elif country == 'UKR':
+            world_pop = os.path.join(base_path,'Worldpop','UKR_ppp_v2b_2015_UNadj.tif')
+     
         # set path for global country shapes
         shp_world = os.path.join(base_path,'input_data','country_shapes.shp')
     
         # set country shapefile paths
         shp_country =  os.path.join(calc_dir,'%s.shp' % country)
-        rural_country_shp =  os.path.join(calc_dir,'rural_%s.shp' % country)
         buffer_file = os.path.join(calc_dir,'%s_buffer.shp' % country)
-        buffer_rural = os.path.join(calc_dir,'rural_roads_%s.shp' % country)
     
     # =============================================================================
     #     """ Get country boundary from world boundaries file and save to shp"""
@@ -105,35 +110,46 @@ def single_country(country,continent_osm,base_path,grump,overwrite=False,tertiar
         
         urban_geoms = gpd.read_file(grump)
         urban_geoms.crs = {'init' :'epsg:4326'}
-        
-    # =============================================================================
-    #      """ Erase urban areas from the country shape  
-    # =============================================================================
-        
-        if country_boundary['geometry'].values[0].geom_type == 'MultiPolygon':
-            ctry_boundary = gpd.GeoDataFrame([polygon for polygon in country_boundary['geometry'].values[0]],columns=['geometry'])
-            ctry_boundary = ctry_boundary.loc[ctry_boundary.geometry.area > 0.001]
+ 
+        grump_country_in = os.path.join(base_path,'calc','grump_%s.shp' % country)
+        grump_country_out = os.path.join(base_path,'calc','exact_grump_%s.shp' % country)
+
+        if len(urban_geoms.loc[urban_geoms['ISO3']==country]) != 0:        
+            urban_geoms = urban_geoms.loc[urban_geoms['ISO3']==country]
+            urban_geoms.to_file(grump_country_in)
+            os.system('ogr2ogr -skipfailures -nlt geometry -clipsrc '+shp_country+' '+grump_country_out+' '+grump_country_in)
+        elif country == 'TUV':
+            None
         else:
-            ctry_boundary = country_boundary
-        # now get the rural areas of the country and save this to a shp
-        rural_country =  spatial_overlays(ctry_boundary, urban_geoms, how='difference')
-    #        rural_country = spatial_difference(ctry_boundary, urban_geoms)
-        rural_country.to_file(rural_country_shp)
-        
+            urban_geoms = spatial_overlays(country_boundary,urban_geoms)
+            urban_geoms.to_file(grump_country_in)
+            os.system('ogr2ogr -skipfailures -nlt geometry -clipsrc '+shp_country+' '+grump_country_out+' '+grump_country_in)
+      
+    # =============================================================================
+    #      """ Subtract the people living in urban areas from the total population  
+    # =============================================================================
+
         """ Estimate the total population living in rural areas """
-        stats_ctry = sum(item['sum'] for item in zonal_stats(rural_country,world_pop,
-                stats="sum") if item['sum'] is not None)
+        country_tot = sum(item['sum'] for item in zonal_stats(country_boundary,world_pop,
+            stats="sum") if item['sum'] is not None)
+        if country == 'TUV':
+            stats_ctry  = country_tot
+        else:
+            stats_ctry = country_tot- sum(item['sum'] for item in zonal_stats(gpd.read_file(grump_country_out),world_pop,
+                    stats="sum") if item['sum'] is not None) 
     
     # =============================================================================
     #     """ Next step is to load roads of the country and create a buffer """
     # =============================================================================
        
         # load data, similar as when we estimate the length of the roads
-        load_country = get_country(country,continent_osm,base_path,overwrite,RAI=True)
+        load_country = get_country(country,continent_osm,base_path,overwrite=False,RAI=True)
        
         # if we include tertiary as well, we do a different filter
         if tertiary == True:
             load_country = load_country.loc[load_country['roads'].isin(['primary','secondary','tertiary'])]
+        elif track == True:
+            load_country = load_country.loc[load_country['roads'].isin(['primary','secondary','tertiary','track'])]
         else:
             load_country = load_country.loc[load_country['roads'].isin(['primary','secondary'])]
             
@@ -164,8 +180,11 @@ def single_country(country,continent_osm,base_path,grump,overwrite=False,tertiar
         load_country = load_country.to_crs(epsg=4326)
         
         # union this to one multipolygon and save to a shapefile
-        poly = load_country['geometry'].unary_union
-    
+        try:
+            poly = load_country['geometry'].unary_union
+        except:
+            poly = load_country['geometry'].buffer(0).unary_union
+        
         # define a polygon feature geometry with one attribute
         schema = {
             'geometry': 'Polygon',
@@ -184,27 +203,29 @@ def single_country(country,continent_osm,base_path,grump,overwrite=False,tertiar
     #     """ Here we exlude urban areas from the road buffer file, similar as how
     #     we did it in the country boundary file """
     # =============================================================================
-        try:
-            # load files and overlay
-            roads_buffer = gpd.GeoDataFrame(gpd.read_file(buffer_file)['geometry'])
-            roads_buffer.reset_index(inplace=True,drop=True)
-            rural_country.reset_index(inplace=True,drop=True)
-            rural_roads = spatial_overlays(roads_buffer, rural_country, how='intersection')
-            # and write to shapefile
-            rural_roads.to_file(buffer_rural)
-        except:
-            if country in islands:
-                try:
-                    shutil.rmtree(temp_path, ignore_errors=True)
-                except:
-                    True
-            return {country: [stats_ctry,0,0]}
-    
-    
+        buffer_inb = os.path.join(base_path,'calc','%s_buffer.shp' % country)
+        buffer_in = os.path.join(base_path,'calc','%s_buffer_exact.shp' % country)
+
+        buffer_out = os.path.join(base_path,'calc','%s_buffer_urban.shp' % country)
+        os.system('ogr2ogr -skipfailures -nlt geometry -clipsrc '+buffer_inb+' '+buffer_in+' '+shp_country)
+ 
+        total_buffer = gpd.read_file(buffer_in)  
+        if country == 'TUV':
+             None   
+        else:
+            urban_geoms_exact = gpd.read_file(grump_country_out)
+            urban_buffer = spatial_overlays(total_buffer,urban_geoms_exact,how='intersection')
+            urban_buffer.to_file(buffer_out)    
+   
         """ Estimate the total rural population living within 2km of selected roads"""
-        stats_roads = sum(item['sum'] for item in zonal_stats(buffer_rural,world_pop,
-                stats="sum") if item['sum'] is not None)   
-       
+        tot_buf_country = sum(item['sum'] for item in zonal_stats(total_buffer,world_pop,
+                stats="sum") if item['sum'] is not None) 
+        if country == 'TUV':
+            stats_roads = tot_buf_country
+        else:
+            stats_roads = tot_buf_country- sum(item['sum'] for item in zonal_stats(urban_buffer,world_pop,
+                stats="sum") if item['sum'] is not None)
+        
         if country in islands:
             try:
                 shutil.rmtree(temp_path, ignore_errors=True)
@@ -226,6 +247,7 @@ def single_country(country,continent_osm,base_path,grump,overwrite=False,tertiar
     except Exception as e: 
         print(str(e)+' for %s' % country)
         return {country: [0,0,0]}
+
 
 def all_countries(base_path,multiprocess=True,overwrite=True,tertiary=False):
     

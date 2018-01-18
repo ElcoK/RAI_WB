@@ -169,7 +169,7 @@
 <h2>Single country<a class="headerlink" href="#single-country" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt>
-<code class="descclassname">scripts.RAI.</code><code class="descname">single_country</code><span class="sig-paren">(</span><em>country</em>, <em>continent_osm</em>, <em>base_path</em>, <em>grump</em>, <em>overwrite=False</em>, <em>tertiary=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/RAI.html#single_country"><span class="viewcode-link">[source]</span></a></dt>
+<code class="descclassname">scripts.RAI.</code><code class="descname">single_country</code><span class="sig-paren">(</span><em>country</em>, <em>continent_osm</em>, <em>base_path</em>, <em>grump</em>, <em>overwrite=False</em>, <em>tertiary=False</em>, <em>track=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/RAI.html#single_country"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Estimation of the Rural Accesibility Index (RAI) for the specified country.</p>
 <p>The RAI is calculated by using the methodology specified in the report below:</p>
 <blockquote>
@@ -177,14 +177,15 @@
 Washington, D.C. : World Bank Group.  <a class="reference external" href="http://bit.ly/2p5asME">http://bit.ly/2p5asME</a></div></blockquote>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd><p class="first"><em>country</em> : The country for which we calculate the RAI.</p>
-<p><em>continent_osm</em> : The continent the country ‘belongs’ to. This is required for the osm extraction.</p>
-<p><em>base_path</em> : The base path to the location of all files and scripts.</p>
-<p><em>grump</em> : The path string to the grump (global urban areas) shapefile.</p>
-<p class="last"><em>tertiary</em> : The default option is ‘False’, but if we want to estimate the RAI for tertiary roads as well, we can set this option to ‘True’.</p>
+<dd><p class="first">country: to country for which we calculate the RAI.</p>
+<p>continent_osm: the continent that the country ‘belongs’ to. This is required in the osm extraction.</p>
+<p>base_path: base path to location of all files.</p>
+<p>idx_urban: rTree index of the urban areas. By using an rtree index, we can quickly find the intersecting areas.</p>
+<p>tertiary: default option is ‘False’, but if we want to estimate the RAI for tertiary roads as well, we can set this option to ‘True’.</p>
+<p class="last">track: default option is ‘False’, but if we want to estimate the RAI for both tracks and tertiary roads as well, we can set this option to ‘True’.</p>
 </dd>
 <dt>Returns:</dt>
-<dd>A dictionary with the <strong>country name</strong> as the key and the <strong>total rural population</strong>, the <strong>total rural population within 2km of the selected roads</strong> and the <strong>RAI</strong> as values.</dd>
+<dd>A dictionary with the country name as the key and the total rural population, total population with 2km of selected roads and the RAI as values.</dd>
 </dl>
 </dd></dl>
 
