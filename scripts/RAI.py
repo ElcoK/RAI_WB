@@ -29,20 +29,20 @@ def single_country(country,continent_osm,base_path,grump,overwrite=False,tertiar
         Washington, D.C. : World Bank Group.  http://bit.ly/2p5asME 
     
     Args:
-        country: to country for which we calculate the RAI.
+        *country*: to country for which we calculate the RAI.
         
-        continent_osm: the continent that the country 'belongs' to. This is required in the osm extraction.
+        *continent_osm*: the continent that the country 'belongs' to. This is required in the osm extraction.
         
-        base_path: base path to location of all files.
+        *base_path*: base path to location of all files.
         
-        idx_urban: rTree index of the urban areas. By using an rtree index, we can quickly find the intersecting areas.
+        *idx_urban*: rTree index of the urban areas. By using an rtree index, we can quickly find the intersecting areas.
         
-        tertiary: default option is 'False', but if we want to estimate the RAI for tertiary roads as well, we can set this option to 'True'.
+        *tertiary*: default option is 'False', but if we want to estimate the **RAI** for tertiary roads as well, we can set this option to 'True'.
 
-        track: default option is 'False', but if we want to estimate the RAI for both tracks and tertiary roads as well, we can set this option to 'True'.
+        *track*: default option is 'False', but if we want to estimate the **RAI** for both tracks and tertiary roads as well, we can set this option to 'True'.
         
     Returns:
-        A dictionary with the country name as the key and the total rural population, total population with 2km of selected roads and the RAI as values.
+        A dictionary with the **total rural population**, the **total rural population within 2km of the selected roads** and the **RAI** for the specified country.
     """ 
     try:
     
@@ -264,7 +264,7 @@ def all_countries(base_path,multiprocess=True,overwrite=True,tertiary=False):
         *tertiary* : Set to False by default. When set to True, the calculation of the **RAI** will run a second time, now including tertiary roads.
 
     Returns:
-        An Excel file the **total rural population**, the **total rural population within 2km of the selected roads** and the **RAI** for each country. if *tertiary* is set to True, the Excel file will return an additional sheet with the results of that second calculation.
+        An Excel with file the **total rural population**, the **total rural population within 2km of the selected roads** and the **RAI** for each country. if *tertiary* is set to True, the Excel file will return an additional sheet with the results of that second calculation.
     
     """
     
